@@ -11,10 +11,8 @@ export class DBService {
   async keyExists(key: string): Promise<boolean> {
     const col = this.firestore.collection('publicKeys').get().toPromise();
     const documents = await col;
-    return !!documents.docs.filter(async doc => {
-      const docData = doc.data();
-      return docData?.key === key;
-    }).length;
+    const allKeys = documents.docs.map(doc => doc.data()?.key);
+    return allKeys.includes(key)
   }
 
   async addKey(key: string): Promise<void> {

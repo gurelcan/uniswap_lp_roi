@@ -28,7 +28,7 @@ export class Web3Service {
       const address = await this.getAddress();
       const exists = await this.db.keyExists(address);
       if (!exists) {
-        this.db.addKey(address);
+        await this.db.addKey(address);
       }
     }
   }
