@@ -1,13 +1,13 @@
 // Angular
 import { Component } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators, FormArray } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 // Service
 import { PoolService } from './services/pool.service';
 
 // RxJs
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 
 // Utils
 import { BigNumber } from 'ethers';
@@ -34,13 +34,14 @@ export class AppComponent {
   public form = new FormGroup({
     investment: new FormControl(),
     days: new FormControl(),
-    ethPrice: new FormControl(),
-    tokenPrice: new FormControl(),
+    tokens: new FormArray([]),
     liquidity: new FormControl(),
     volume: new FormControl()
   });
 
   public poolData;
+
+  private sub: Subscription;
 
   constructor(
     private poolService: PoolService,
@@ -49,11 +50,25 @@ export class AppComponent {
   }
 
   searchPool(): void {
+    /* State handling */
+    this.form.reset();
+    if ((this.form.get('tokens') as FormArray).controls.length) {
+      (this.form.get('tokens') as FormArray).controls = [];
+    }
+    this.showInputs.next(false);
+    this.poolData = undefined;
     this.loading.next(true);
+    if (this.sub) this.sub.unsubscribe();
+
     const poolAPI = this.poolService.fetchPool(this.searchCtrl.value);
-    poolAPI.subscribe(data => {
-      this.poolData = data.results.filter(pool => pool.exchange === this.searchCtrl.value)[0];
-      if (!this.poolData?.assets) {
+    this.sub = poolAPI.subscribe(data => {
+      this.poolData = data;
+
+      /* Set the form controls */
+      this.poolData.assets.forEach(asset =>
+        (this.form.get('tokens') as FormArray).controls.push(new FormControl(this.calculateUSDValue(asset))));
+
+      if (!this.poolData) {
         this.snackbar.open('Did not found any pool for the address');
         this.loading.next(false);
       } else {
@@ -72,6 +87,8 @@ export class AppComponent {
         }
 
         this.calculateROI();
+
+        /* State handling */
         this.loading.next(false);
         this.showInputs.next(true);
       }
@@ -100,5 +117,10 @@ export class AppComponent {
     }
 
     return value;
+  }
+
+  calculateUSDValue(asset: any): number {
+    const ethPrice = (this.poolData.usdLiquidity / 2) / (asset.balance);
+    return ethPrice;
   }
 }

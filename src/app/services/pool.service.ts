@@ -12,10 +12,9 @@ export class PoolService {
 
   fetchPool(address: string): Observable<any> {
     return this.http.get(
-      `https://data-api.defipulse.com/api/v1/blocklytics/pools/v1/exchanges`,
+      `https://data-api.defipulse.com/api/v1/blocklytics/pools/v1/exchange/${address}`,
       {
         params: {
-        /*   address, */
           'api-key': apiKey
         }
       });

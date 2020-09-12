@@ -22,6 +22,7 @@
 
   <!-- Inputs -->
   <article class="inputs" *ngIf="showInputs.asObservable() | async">
+    <h3 *ngIf="poolData">👉 <span class="primary-color">{{poolData.poolName || 'Nothing found'}}</span></h3>
     <mat-form-field appearance="outline">
       <mat-label>Investment in USD</mat-label>
       <input matInput type="number" [formControl]="form.get('investment')" autocomplete="off">
@@ -32,21 +33,18 @@
       <input matInput type="number" [formControl]="form.get('days')" autocomplete="off">
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Eth price in USD</mat-label>
-      <input matInput type="number" [formControl]="form.get('ethPrice')" autocomplete="off">
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Token price in USD</mat-label>
-      <input matInput type="number" [formControl]="form.get('tokenPrice')" autocomplete="off">
-    </mat-form-field>
+    <ng-container *ngFor="let asset of poolData.assets; let index = index">
+      <mat-form-field appearance="outline">
+        <mat-label>{{ asset.symbol }} price in USD</mat-label>
+        <input matInput type="number" [formControl]="form.get('tokens').controls[index]" autocomplete="off">
+      </mat-form-field>
+    </ng-container>
 
     <span>Liquidity: {{ form.get('liquidity').value | toFix }}</span>
     <div class="row">
-      <mat-slider thumbLabel [displayWith]="formatLabel" [min]="sliderConfig.liqMin"
-      [max]="sliderConfig.liqMax" color="primary" [formControl]="form.get('liquidity')"></mat-slider>
-    <!--   <mat-form-field>
+      <mat-slider thumbLabel [displayWith]="formatLabel" [min]="sliderConfig.liqMin" [max]="sliderConfig.liqMax"
+        color="primary" [formControl]="form.get('liquidity')"></mat-slider>
+      <!--   <mat-form-field>
         <mat-label>Liquidity</mat-label>
         <input matInput type="number" [formControl]="form.get('liquidity')">
       </mat-form-field> -->
@@ -54,9 +52,9 @@
 
     <span>Volume: {{ form.get('volume').value | toFix }}</span>
     <div class="row">
-      <mat-slider thumbLabel [displayWith]="formatLabel" [min]="sliderConfig.volMin"
-      [max]="sliderConfig.volMax" color="primary" [formControl]="form.get('volume')"></mat-slider>
-  <!--     <mat-form-field>
+      <mat-slider thumbLabel [displayWith]="formatLabel" [min]="sliderConfig.volMin" [max]="sliderConfig.volMax"
+        color="primary" [formControl]="form.get('volume')"></mat-slider>
+      <!--     <mat-form-field>
         <mat-label>Volume</mat-label>
         <input matInput type="number" [formControl]="form.get('volume')">
       </mat-form-field> -->
@@ -67,7 +65,7 @@
 
   <article class="pool-information" *ngIf="poolData">
     <h3>
-      Assets <span>&#x1F447;</span>
+      Assets <span>👇</span>
     </h3>
     <div>
       <ng-container *ngFor="let asset of poolData?.assets; let last = last">

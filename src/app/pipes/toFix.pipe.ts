@@ -6,6 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class ToFixPipe implements PipeTransform {
   transform(value: number, decimal?: number): string {
     if (decimal) return value.toFixed(decimal);
-    return value.toFixed(0);
+    if (value) return value.toFixed(0);
+    return '0';
   }
 }
