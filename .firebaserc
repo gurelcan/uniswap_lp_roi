@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "uniswap-roi": {
+      "hosting": {
+        "uniswap-roi": [
+          "uniswap-roi"
+        ]
+      }
+    }
+  }
+}

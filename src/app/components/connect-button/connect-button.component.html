@@ -1,0 +1,8 @@
+<ng-container *ngIf="!(isConnected.asObservable() | async); else connected">
+  <button mat-raised-button color="primary" (click)="connect()">Connect Wallet <mat-icon>account_balance_wallet
+    </mat-icon></button>
+</ng-container>
+<ng-template #connected>
+  <button mat-raised-button color="accent" (click)="disconnect()">Disconnect Wallet <mat-icon>account_balance_wallet
+    </mat-icon></button>
+</ng-template>
