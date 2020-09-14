@@ -10,9 +10,9 @@ import { apiKey } from 'secrets';
 export class PoolService {
   constructor(private http: HttpClient) { }
 
-  fetchPool(address: string): Observable<any> {
+  fetchPool(address?: string): Observable<any> {
     return this.http.get(
-      `https://data-api.defipulse.com/api/v1/blocklytics/pools/v1/exchange/${address}`,
+      `https://data-api.defipulse.com/api/v1/blocklytics/pools/v1/exchanges`,
       {
         params: {
           'api-key': apiKey
