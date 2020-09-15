@@ -11,6 +11,9 @@ import { PoolService } from './services/pool.service';
 import { BehaviorSubject, Subscription } from 'rxjs';
 
 // Web3
+import { Fetcher } from '@uniswap/sdk/';
+import { Token } from '@uniswap/sdk';
+import { ChainId } from '@uniswap/sdk';
 
 @Component({
   selector: 'app-root',
@@ -151,7 +154,7 @@ export class AppComponent {
 
       this.inputConfig[1].min = this.tokenTwoPriceFetched / tokenTwoPriceAllowedRange;
       this.inputConfig[1].max = this.tokenTwoPriceFetched * tokenTwoPriceAllowedRange;
-      console.log(volumeAfterAppreciation / volumeChangeAllowedRange, volumeAfterAppreciation , volumeChangeAllowedRange, this.form.get('liquidity').value)
+      console.log(volumeAfterAppreciation / volumeChangeAllowedRange, volumeAfterAppreciation, volumeChangeAllowedRange, this.form.get('liquidity').value)
       this.inputConfig.volMin = volumeAfterAppreciation / volumeChangeAllowedRange;
       this.inputConfig.volMax = volumeAfterAppreciation * volumeChangeAllowedRange;
       this.inputConfig.liqMin = this.findMaxValue(liquidityAfterAppreciation / liquidityChangeAllowedRange,
@@ -210,6 +213,7 @@ export class AppComponent {
   }
 
   async calculateUSDValue(asset: any): Promise<number> {
+    /*  const fetcher = Fetcher.fetchPairData(new Token(ChainId.MAINNET, asset.address, 18), new Token(ChainId.MAINNET, asset.address, 18)); */
     const usdPrice = (this.poolData.usdLiquidity / 2) / (asset.balance);
     return usdPrice;
   }

@@ -101,7 +101,13 @@ mat-card {
 
 table {
   width: 100%;
-  td {
+  height: 100%;
+  td, th {
     text-align: end;
   }
+}
+
+
+mat-divider {
+  width: 100%;
 }

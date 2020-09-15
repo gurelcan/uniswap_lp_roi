@@ -82,7 +82,8 @@
 
   <!-- Pool information -->
 
-  <article class="pool-information" *ngIf="showInputs.asObservable() | async">
+  <article class="pool-information" *ngIf="showInputs.asObservable() | async"
+    style="width: 100%; padding: 20px; height: 300px;">
     <table>
       <tr>
         <th></th>
@@ -98,6 +99,7 @@
         <td>{{ form.get('investment').value }}</td>
         <td>{{ form.get('investment').value }}</td>
       </tr>
+      <mat-divider></mat-divider>
       <tr>
         <td><strong>Price Appreciation</strong></td>
         <td>{{ roiResult.get('priceAppreciationForPool') }}</td>
@@ -105,6 +107,7 @@
         <td>{{ roiResult.get('priceAppreciationHODLTokenTwo') }}</td>
         <td>{{ roiResult.get('priceAppreciationHODL5050') }}</td>
       </tr>
+      <mat-divider></mat-divider>
       <tr>
         <td><strong>Impermenant Loss</strong></td>
         <td>{{ roiResult.get('impermenantLoss') }}</td>
@@ -112,10 +115,15 @@
         <td>{{ roiResult.get('impermenantLoss') }}</td>
         <td>{{ roiResult.get('impermenantLoss') }}</td>
       </tr>
+      <mat-divider></mat-divider>
       <tr>
         <td><strong>Fees</strong></td>
         <td>{{ roiResult.get('fees') }}</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
       </tr>
+      <mat-divider></mat-divider>
       <tr>
         <td><strong>Total</strong></td>
         <td>{{ roiResult.get('totalPool') }}</td>
@@ -123,6 +131,7 @@
         <td>{{ roiResult.get('totalHODLTokenTwo') }}</td>
         <td>{{ roiResult.get('total5050') }}</td>
       </tr>
+      <mat-divider></mat-divider>
       <tr>
         <td><strong>ROI</strong></td>
         <td>{{ roiResult.get('roiPool') }}</td>
@@ -130,6 +139,7 @@
         <td>{{ roiResult.get('ROIHODLTokenTwo') }}</td>
         <td>{{ roiResult.get('roi5050') }}</td>
       </tr>
+      <mat-divider></mat-divider>
     </table>
   </article>
 
