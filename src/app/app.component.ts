@@ -11,9 +11,7 @@ import { PoolService } from './services/pool.service';
 import { BehaviorSubject, Subscription } from 'rxjs';
 
 // Web3
-/* import { Token, ChainId, Pair, TokenAmount } from '@uniswap/sdk';
-import { providers, Contract } from 'ethers';
- */
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -51,8 +49,6 @@ export class AppComponent {
   private tokenTwoPriceFetched = 385;
 
   private sub: Subscription;
-
-/*   private web3Provider = new providers.JsonRpcProvider('https://mainnet.infura.io/v3/dcdbe9ba01c745be85f9e2b5b2b7eab8'); */
 
   constructor(
     private poolService: PoolService,
@@ -155,7 +151,7 @@ export class AppComponent {
 
       this.inputConfig[1].min = this.tokenTwoPriceFetched / tokenTwoPriceAllowedRange;
       this.inputConfig[1].max = this.tokenTwoPriceFetched * tokenTwoPriceAllowedRange;
-
+      console.log(volumeAfterAppreciation / volumeChangeAllowedRange, volumeAfterAppreciation , volumeChangeAllowedRange, this.form.get('liquidity').value)
       this.inputConfig.volMin = volumeAfterAppreciation / volumeChangeAllowedRange;
       this.inputConfig.volMax = volumeAfterAppreciation * volumeChangeAllowedRange;
       this.inputConfig.liqMin = this.findMaxValue(liquidityAfterAppreciation / liquidityChangeAllowedRange,
@@ -178,6 +174,16 @@ export class AppComponent {
       this.roiResult.set('ROIHODLTokenOne', totalHODLTokenOne / investment * 100);
       this.roiResult.set('ROIHODLTokenTwo', totalHODLTokenTwo / investment * 100);
       this.roiResult.set('roi5050', total5050 / investment * 100);
+      this.roiResult.set('priceAppreciationForPool', priceAppreciationHODLTokenOne);
+      this.roiResult.set('priceAppreciationHODLTokenOne', priceAppreciationHODLTokenOne);
+      this.roiResult.set('priceAppreciationHODLTokenTwo', priceAppreciationHODLTokenTwo);
+      this.roiResult.set('priceAppreciationHODL5050', priceAppreciationHODL5050);
+      this.roiResult.set('fees', feesCollected);
+      this.roiResult.set('impermenantLoss', impermenantLoss);
+      this.roiResult.set('totalPool', totalPool);
+      this.roiResult.set('totalHODLTokenOne', totalHODLTokenOne);
+      this.roiResult.set('totalHODLTokenTwo', totalHODLTokenTwo);
+      this.roiResult.set('total5050', total5050);
 
       console.log(tokenOneInvested, tokenTwoInvested, CONSTANT, tokenOnePriceInTokenTwo, tokenOneLPAtExit, tokenTwoLPAtExit, liquidityShareAtEntry, tokenOneRemoved, liquidityShareAtExit,
         liquidityShareAverage, tokenTwoRemoved, volumePriceAppreciation, volumeAfterAppreciation, feesCollected);
@@ -204,14 +210,7 @@ export class AppComponent {
   }
 
   async calculateUSDValue(asset: any): Promise<number> {
-/*     const erc20Contract = new Contract(asset.address, ['function decimal() returns(uint8)'], this.web3Provider);
-    const decimal = await erc20Contract.decimal();
-    console.log(decimal);
-    const usdt = new Token(ChainId.MAINNET, '0xdac17f958d2ee523a2206206994597c13d831ec7', 18);
-    const token = new Token(ChainId.MAINNET, asset.address, decimal); */
     const usdPrice = (this.poolData.usdLiquidity / 2) / (asset.balance);
-/*     const pair = new Pair(new TokenAmount(token, '2000000000000000000'), new TokenAmount(usdt, '2000000000000000000')); */
-/* TOD SERACH FOR UNISWAP PRICE ORALCE FUNCTION */
     return usdPrice;
   }
 

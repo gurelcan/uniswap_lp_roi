@@ -83,8 +83,54 @@
   <!-- Pool information -->
 
   <article class="pool-information" *ngIf="showInputs.asObservable() | async">
-    <h1>ROI: {{ (roiResult.get('roiPool')) || poolData.roi }}%</h1>
+    <table>
+      <tr>
+        <th></th>
+        <th>Pool</th>
+        <th>HODL Token</th>
+        <th>HODL Token2</th>
+        <th>HODL 50% - 50%</th>
+      </tr>
+      <tr>
+        <td><strong>Invested Amount</strong></td>
+        <td>{{ form.get('investment').value }}</td>
+        <td>{{ form.get('investment').value }}</td>
+        <td>{{ form.get('investment').value }}</td>
+        <td>{{ form.get('investment').value }}</td>
+      </tr>
+      <tr>
+        <td><strong>Price Appreciation</strong></td>
+        <td>{{ roiResult.get('priceAppreciationForPool') }}</td>
+        <td>{{ roiResult.get('priceAppreciationHODLTokenOne') }}</td>
+        <td>{{ roiResult.get('priceAppreciationHODLTokenTwo') }}</td>
+        <td>{{ roiResult.get('priceAppreciationHODL5050') }}</td>
+      </tr>
+      <tr>
+        <td><strong>Impermenant Loss</strong></td>
+        <td>{{ roiResult.get('impermenantLoss') }}</td>
+        <td>{{ roiResult.get('impermenantLoss') }}</td>
+        <td>{{ roiResult.get('impermenantLoss') }}</td>
+        <td>{{ roiResult.get('impermenantLoss') }}</td>
+      </tr>
+      <tr>
+        <td><strong>Fees</strong></td>
+        <td>{{ roiResult.get('fees') }}</td>
+      </tr>
+      <tr>
+        <td><strong>Total</strong></td>
+        <td>{{ roiResult.get('totalPool') }}</td>
+        <td>{{ roiResult.get('totalHODLTokenOne') }}</td>
+        <td>{{ roiResult.get('totalHODLTokenTwo') }}</td>
+        <td>{{ roiResult.get('total5050') }}</td>
+      </tr>
+      <tr>
+        <td><strong>ROI</strong></td>
+        <td>{{ roiResult.get('roiPool') }}</td>
+        <td>{{ roiResult.get('ROIHODLTokenOne') }}</td>
+        <td>{{ roiResult.get('ROIHODLTokenTwo') }}</td>
+        <td>{{ roiResult.get('roi5050') }}</td>
+      </tr>
+    </table>
   </article>
 
 </main>
-<footer></footer>
