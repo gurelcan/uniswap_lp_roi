@@ -27,6 +27,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatCardModule } from '@angular/material/card';
+import { MatDividerModule} from '@angular/material/divider';
 
 @NgModule({
   declarations: [
@@ -51,7 +54,10 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatIconModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatTooltipModule,
+    MatCardModule,
+    MatDividerModule
   ],
   bootstrap: [AppComponent]
 })
