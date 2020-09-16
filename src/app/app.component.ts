@@ -10,12 +10,6 @@ import { PoolService } from './services/pool.service';
 // RxJs
 import { BehaviorSubject, Subscription } from 'rxjs';
 
-// Web3
-import { Contract, providers } from 'ethers';
-import { Token } from './uniswap/entities/token';
-import { Fetcher, Route } from './uniswap';
-import { infuraID } from 'secrets';
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -48,15 +42,11 @@ export class AppComponent {
 
   public poolData;
 
-  private wasCalled = false;
-
   private tokenOnePriceFetched: number;
 
   private tokenTwoPriceFetched: number;
 
   private sub: Subscription;
-
-  private provider = new providers.JsonRpcProvider('https://mainnet.infura.io/v3/' + infuraID);
 
   constructor(
     private poolService: PoolService,
@@ -64,9 +54,9 @@ export class AppComponent {
     private title: Title) {
     this.title.setTitle('Uniswap ROI');
 
-    this.form.valueChanges.subscribe(value => {
-      if (value.tokens.length) this.calculateROI();
-    })
+    this.form.valueChanges.subscribe(_ => {
+      this.calculateROI();
+    });
   }
 
   searchPool(): void {
@@ -83,33 +73,18 @@ export class AppComponent {
     const poolAPI = this.poolService.fetchPool();
     this.sub = poolAPI.subscribe(async data => {
       this.poolData = data.results.filter(x => x.exchange === this.searchCtrl.value.toLowerCase())[0];
-
+      console.log()
       if (!this.poolData) {
         this.snackbar.open('Did not found any pool for the address');
         this.loading.next(false);
       } else {
         try {
-          if (!this.wasCalled) {
-            this.wasCalled = true;
-            try {
-              this.tokenOnePriceFetched = parseInt(await
-                (await this.fetchPrice(this.poolData.assets[0].address)).midPrice.toSignificant(12), 10);
-              this.tokenTwoPriceFetched = parseInt(await
-                (await this.fetchPrice(this.poolData.assets[1].address)).midPrice.toSignificant(12), 10);
-            } catch (error) {
-              console.error(error);
-              this.tokenOnePriceFetched = this.calculateUSDValue(this.poolData.assets[0]);
-              this.tokenTwoPriceFetched = this.calculateUSDValue(this.poolData.assets[1]);
-            }
-          }
+
           /* Set the form controls */
-          this.poolData.assets.forEach(async asset => {
-            (this.form.get('tokens') as FormArray).push(new FormControl(this.calculateUSDValue(asset)));
-          });
           this.form.get('liquidity').setValue(this.poolData.usdLiquidity);
           this.form.get('volume').setValue(this.poolData.usdVolume);
-
-          this.calculateROI();
+          (this.form.get('tokens') as FormArray).push(new FormControl(this.calculateUSDValue(this.poolData.assets[0])));
+          (this.form.get('tokens') as FormArray).push(new FormControl(this.calculateUSDValue(this.poolData.assets[1])));
 
         } catch (error) {
           console.error('error parsing data');
@@ -128,12 +103,17 @@ export class AppComponent {
 
   calculateROI(): void {
     const { investment, days, liquidity, tokens, volume } = this.form.value;
+
+    if (!tokens.length) return;
+
     const { usdLiquidity, usdVolume, assets } = this.poolData;
 
     const tokenOne = assets[0];
     const tokenTwo = assets[1];
 
-    console.log(this.tokenTwoPriceFetched, this.tokenOnePriceFetched);
+    this.tokenOnePriceFetched = this.calculateUSDValue(this.poolData.assets[0]);
+    this.tokenTwoPriceFetched = this.calculateUSDValue(this.poolData.assets[1]);
+
     try {
 
       /* Calculation variables for ROI */
@@ -183,6 +163,7 @@ export class AppComponent {
       const totalHODLTokenOne = investment + priceAppreciationHODLTokenOne;
       const totalHODLTokenTwo = investment + priceAppreciationHODLTokenTwo;
       const total5050 = investment + priceAppreciationHODL5050;
+
       this.roiResult.set('roiPool', totalPool / investment * 100);
       this.roiResult.set('ROIHODLTokenOne', totalHODLTokenOne / investment * 100);
       this.roiResult.set('ROIHODLTokenTwo', totalHODLTokenTwo / investment * 100);
@@ -198,8 +179,9 @@ export class AppComponent {
       this.roiResult.set('totalHODLTokenTwo', totalHODLTokenTwo);
       this.roiResult.set('total5050', total5050);
       /* 
-            console.log(tokenOneInvested, tokenTwoInvested, CONSTANT, tokenOnePriceInTokenTwo, tokenOneLPAtExit, tokenTwoLPAtExit, liquidityShareAtEntry, tokenOneRemoved, liquidityShareAtExit,
-              liquidityShareAverage, tokenTwoRemoved, volumePriceAppreciation, volumeAfterAppreciation, feesCollected); */
+            console.log(tokenOneInvested, tokenTwoInvested, CONSTANT, tokenOnePriceInTokenTwo, tokenOneLPAtExit, tokenTwoLPAtExit,
+              liquidityShareAtEntry, tokenOneRemoved, liquidityShareAtExit, liquidityShareAverage, tokenTwoRemoved, volumePriceAppreciation,
+              volumeAfterAppreciation, feesCollected); */
 
       this.showInputs.next(true);
       this.loading.next(false);
@@ -227,16 +209,26 @@ export class AppComponent {
     return usdPrice;
   }
 
-  public async fetchPrice(address: string): Promise<Route> {
-    const erc20 = new Contract(address, ['function decimals() view returns (uint8)'], this.provider);
-    const decimals = await erc20.decimals();
-    const networkId = 1;
-    const tokenOne = new Token(networkId, address, decimals);
-    const tokenTwo = new Token(networkId, '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', 18);
-    const pair = await Fetcher.fetchPairData(tokenTwo, tokenOne, this.provider);
-    const route = new Route([pair], tokenTwo);
-    return route;
-  }
+  /*  public async fetchPrice(): Promise<any> {
+     const contract = new Contract(this.poolData.exchange, UniswapV2Pair.abi, this.provider);
+     const [reserves0, reserves1] = await contract.getReserves()
+     const parseReserves0 = utils.formatUnits(reserves0, 18);
+     const kLast = await contract.kLast();
+     console.log(this.getLiquidityValue(new Token(1, this.poolData.assets[0].address, 18),
+       new TokenAmount(new Token(1, this.poolData.assets[0].address, 18), reserves1),
+       new TokenAmount(new Token(1, this.poolData.assets[0].address, 18), reserves0),
+       false,
+       kLast
+     ))
+     return ' cool'; */
+  /*     const erc20 = new Contract(address, ['function decimals() view returns (uint8)'], this.provider);
+      const decimals = await erc20.decimals();
+      const networkId = 1;
+      const tokenOne = new Token(networkId, address, decimals);
+      const tokenTwo = new Token(networkId, '0x6b175474e89094c44da98b954eedeac495271d0f', 18);
+      const pair = await Fetcher.fetchPairData(tokenTwo, tokenOne, this.provider);
+      const route = new Route([pair], tokenTwo);
+      return route; */
 
   private findMaxValue(one: number, two: number): number {
     return one >= two ? one : two;

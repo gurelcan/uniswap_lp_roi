@@ -9,7 +9,6 @@
     <mat-form-field appearance="outline">
       <mat-label>Type in pool address</mat-label>
       <input matInput [formControl]="searchCtrl" type="text" autocomplete="off">
-      <mat-error *ngIf="searchCtrl.hasError('pattern')">This is not a valid Ethereum address</mat-error>
     </mat-form-field>
     <ng-container *ngIf="loading.asObservable() | async; else search">
       <mat-spinner color="primary"></mat-spinner>
