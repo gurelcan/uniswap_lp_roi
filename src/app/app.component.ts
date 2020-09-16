@@ -11,9 +11,10 @@ import { PoolService } from './services/pool.service';
 import { BehaviorSubject, Subscription } from 'rxjs';
 
 // Web3
-import { Fetcher } from '@uniswap/sdk/';
-import { Token } from '@uniswap/sdk';
-import { ChainId } from '@uniswap/sdk';
+import { Contract, providers } from 'ethers';
+import { Token } from './uniswap/entities/token';
+import { Fetcher, Route } from './uniswap';
+import { infuraID } from 'secrets';
 
 @Component({
   selector: 'app-root',
@@ -53,6 +54,8 @@ export class AppComponent {
 
   private sub: Subscription;
 
+  private provider = new providers.JsonRpcProvider('https://mainnet.infura.io/v3/'+ infuraID);
+
   constructor(
     private poolService: PoolService,
     private snackbar: MatSnackBar,
@@ -61,10 +64,6 @@ export class AppComponent {
 
     this.form.valueChanges.subscribe(value => {
       if (value.tokens.length) this.calculateROI();
-
-      // TODO FETCH ETH PRICE
-      /*   this.tokenOnePrice = this.web3.tokenOnePrice() */
-      // TODO TOKEN PRICE from ASSET liquidi
     })
   }
 
@@ -115,7 +114,6 @@ export class AppComponent {
   async calculateROI(): Promise<void> {
     const { investment, days, liquidity, tokens, volume } = this.form.value;
     const { usdLiquidity, usdVolume, assets } = this.poolData;
-    console.log(this.poolData);
 
     const tokenOne = assets[0];
     const tokenTwo = assets[1];
@@ -154,7 +152,6 @@ export class AppComponent {
 
       this.inputConfig[1].min = this.tokenTwoPriceFetched / tokenTwoPriceAllowedRange;
       this.inputConfig[1].max = this.tokenTwoPriceFetched * tokenTwoPriceAllowedRange;
-      console.log(volumeAfterAppreciation / volumeChangeAllowedRange, volumeAfterAppreciation, volumeChangeAllowedRange, this.form.get('liquidity').value)
       this.inputConfig.volMin = volumeAfterAppreciation / volumeChangeAllowedRange;
       this.inputConfig.volMax = volumeAfterAppreciation * volumeChangeAllowedRange;
       this.inputConfig.liqMin = this.findMaxValue(liquidityAfterAppreciation / liquidityChangeAllowedRange,
@@ -187,9 +184,9 @@ export class AppComponent {
       this.roiResult.set('totalHODLTokenOne', totalHODLTokenOne);
       this.roiResult.set('totalHODLTokenTwo', totalHODLTokenTwo);
       this.roiResult.set('total5050', total5050);
-
-      console.log(tokenOneInvested, tokenTwoInvested, CONSTANT, tokenOnePriceInTokenTwo, tokenOneLPAtExit, tokenTwoLPAtExit, liquidityShareAtEntry, tokenOneRemoved, liquidityShareAtExit,
-        liquidityShareAverage, tokenTwoRemoved, volumePriceAppreciation, volumeAfterAppreciation, feesCollected);
+      /* 
+            console.log(tokenOneInvested, tokenTwoInvested, CONSTANT, tokenOnePriceInTokenTwo, tokenOneLPAtExit, tokenTwoLPAtExit, liquidityShareAtEntry, tokenOneRemoved, liquidityShareAtExit,
+              liquidityShareAverage, tokenTwoRemoved, volumePriceAppreciation, volumeAfterAppreciation, feesCollected); */
 
       this.showInputs.next(true);
       this.loading.next(false);
@@ -213,12 +210,52 @@ export class AppComponent {
   }
 
   async calculateUSDValue(asset: any): Promise<number> {
-    /*  const fetcher = Fetcher.fetchPairData(new Token(ChainId.MAINNET, asset.address, 18), new Token(ChainId.MAINNET, asset.address, 18)); */
+    const erc20 = new Contract(asset.address, ['function decimals() view returns (uint8)'], this.provider);
+    const decimals = await erc20.decimals();
     const usdPrice = (this.poolData.usdLiquidity / 2) / (asset.balance);
     return usdPrice;
   }
+
+  public async fetchPrice(token , tokenToCompare) {
+    if (token.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') {
+      token = {
+        "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        "symbol": "WETH",
+        "decimal": 18,
+        "chainId": 1,
+        "type": "default",
+        "img": `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png`
+      }
+    }
+    const networkId = 1;
+    const tokenOne = new Token(networkId, token.address, token.decimal);
+    const tokenTwo = new Token(networkId, tokenToCompare.address, tokenToCompare.decimal);
+    const pair = await Fetcher.fetchPairData(tokenOne, tokenTwo);
+    const route = new Route([pair], tokenTwo);
+    return route;
+  }
+
+/*   async getTokenPice() {
+    const tokenA = new Token();
+    const tokenB = new Token();
+    const address = Pair.getAddress(tokenA, tokenB);
+    const [reserves0, reserves1] = await new Contract(address, ['function getReserves() public view returns (uint112 _reserve0, uint112 _reserve1, uint32 _blockTimestampLast)], provider).getReserves()'], this.provider).getReserves();
+    const balances = tokenA.sortsBefore(tokenB) ? [reserves0, reserves1] : [reserves1, reserves0];
+    return new Pair(new TokenAmount(tokenA, balances[0]), new TokenAmount(tokenB, balances[1]));
+  } */
 
   private findMaxValue(one: number, two: number): number {
     return one >= two ? one : two;
   }
 }
+/* 
+export class TokenAmount extends CurrencyAmount {
+  public readonly token: Token
+
+  // amount _must_ be raw, i.e. in the native representation
+  public constructor(token: Token, amount: BigintIsh) {
+    super(token, amount)
+    this.token = token
+  }
+
+} */
