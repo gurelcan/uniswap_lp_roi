@@ -25,7 +25,7 @@ import { infuraID } from 'secrets';
   }
 })
 export class AppComponent {
-  public searchCtrl = new FormControl('0xbb2b8038a1640196fbe3e38816f3e67cba72d940', Validators.pattern(/^0x[a-fA-F0-9]{40}$/g));
+  public searchCtrl = new FormControl('0x1d6432AEfeAE2c0Ff1393120541863822a4E6Fa7', Validators.pattern(/^0x[a-fA-F0-9]{40}$/g));
 
   public loading = new BehaviorSubject(false);
 
@@ -48,13 +48,15 @@ export class AppComponent {
 
   public poolData;
 
-  private tokenOnePriceFetched = 10437;
+  private wasCalled = false;
 
-  private tokenTwoPriceFetched = 385;
+  private tokenOnePriceFetched: number;
+
+  private tokenTwoPriceFetched: number;
 
   private sub: Subscription;
 
-  private provider = new providers.JsonRpcProvider('https://mainnet.infura.io/v3/'+ infuraID);
+  private provider = new providers.JsonRpcProvider('https://mainnet.infura.io/v3/' + infuraID);
 
   constructor(
     private poolService: PoolService,
@@ -87,14 +89,27 @@ export class AppComponent {
         this.loading.next(false);
       } else {
         try {
+          if (!this.wasCalled) {
+            this.wasCalled = true;
+            try {
+              this.tokenOnePriceFetched = parseInt(await
+                (await this.fetchPrice(this.poolData.assets[0].address)).midPrice.toSignificant(12), 10);
+              this.tokenTwoPriceFetched = parseInt(await
+                (await this.fetchPrice(this.poolData.assets[1].address)).midPrice.toSignificant(12), 10);
+            } catch (error) {
+              console.error(error);
+              this.tokenOnePriceFetched = this.calculateUSDValue(this.poolData.assets[0]);
+              this.tokenTwoPriceFetched = this.calculateUSDValue(this.poolData.assets[1]);
+            }
+          }
           /* Set the form controls */
           this.poolData.assets.forEach(async asset => {
-            (this.form.get('tokens') as FormArray).push(new FormControl(await this.calculateUSDValue(asset)));
+            (this.form.get('tokens') as FormArray).push(new FormControl(this.calculateUSDValue(asset)));
           });
           this.form.get('liquidity').setValue(this.poolData.usdLiquidity);
           this.form.get('volume').setValue(this.poolData.usdVolume);
 
-          await this.calculateROI();
+          this.calculateROI();
 
         } catch (error) {
           console.error('error parsing data');
@@ -111,16 +126,14 @@ export class AppComponent {
     });
   }
 
-  async calculateROI(): Promise<void> {
+  calculateROI(): void {
     const { investment, days, liquidity, tokens, volume } = this.form.value;
     const { usdLiquidity, usdVolume, assets } = this.poolData;
 
     const tokenOne = assets[0];
     const tokenTwo = assets[1];
 
-    this.tokenOnePriceFetched = await this.calculateUSDValue(assets[0]);
-    this.tokenTwoPriceFetched = await this.calculateUSDValue(assets[1]);
-
+    console.log(this.tokenTwoPriceFetched, this.tokenOnePriceFetched);
     try {
 
       /* Calculation variables for ROI */
@@ -209,53 +222,23 @@ export class AppComponent {
     return value;
   }
 
-  async calculateUSDValue(asset: any): Promise<number> {
-    const erc20 = new Contract(asset.address, ['function decimals() view returns (uint8)'], this.provider);
-    const decimals = await erc20.decimals();
+  calculateUSDValue(asset: any): number {
     const usdPrice = (this.poolData.usdLiquidity / 2) / (asset.balance);
     return usdPrice;
   }
 
-  public async fetchPrice(token , tokenToCompare) {
-    if (token.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') {
-      token = {
-        "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-        "symbol": "WETH",
-        "decimal": 18,
-        "chainId": 1,
-        "type": "default",
-        "img": `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png`
-      }
-    }
+  public async fetchPrice(address: string): Promise<Route> {
+    const erc20 = new Contract(address, ['function decimals() view returns (uint8)'], this.provider);
+    const decimals = await erc20.decimals();
     const networkId = 1;
-    const tokenOne = new Token(networkId, token.address, token.decimal);
-    const tokenTwo = new Token(networkId, tokenToCompare.address, tokenToCompare.decimal);
-    const pair = await Fetcher.fetchPairData(tokenOne, tokenTwo);
+    const tokenOne = new Token(networkId, address, decimals);
+    const tokenTwo = new Token(networkId, '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', 18);
+    const pair = await Fetcher.fetchPairData(tokenTwo, tokenOne, this.provider);
     const route = new Route([pair], tokenTwo);
     return route;
   }
-
-/*   async getTokenPice() {
-    const tokenA = new Token();
-    const tokenB = new Token();
-    const address = Pair.getAddress(tokenA, tokenB);
-    const [reserves0, reserves1] = await new Contract(address, ['function getReserves() public view returns (uint112 _reserve0, uint112 _reserve1, uint32 _blockTimestampLast)], provider).getReserves()'], this.provider).getReserves();
-    const balances = tokenA.sortsBefore(tokenB) ? [reserves0, reserves1] : [reserves1, reserves0];
-    return new Pair(new TokenAmount(tokenA, balances[0]), new TokenAmount(tokenB, balances[1]));
-  } */
 
   private findMaxValue(one: number, two: number): number {
     return one >= two ? one : two;
   }
 }
-/* 
-export class TokenAmount extends CurrencyAmount {
-  public readonly token: Token
-
-  // amount _must_ be raw, i.e. in the native representation
-  public constructor(token: Token, amount: BigintIsh) {
-    super(token, amount)
-    this.token = token
-  }
-
-} */
