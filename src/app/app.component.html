@@ -21,10 +21,12 @@
 
   <!-- Inputs -->
   <article class="inputs" *ngIf="showInputs.asObservable() | async">
-
-    <!-- Pool information -->
-
     <mat-card>
+
+      <!-- Pool information -->
+
+      <h3 class="primary-color">Initial Values (During Deposit)</h3>
+
       <div class="pool-data">
         <ng-container *ngFor="let token of poolData.assets">
           <span>
@@ -34,8 +36,8 @@
         </ng-container>
       </div>
       <div class="pool-data">
-        <span><strong>Liquidity:</strong> {{ poolData.usdLiquidity | toFix: 2 }} $</span>
-        <span><strong>Volume:</strong> {{ poolData.usdVolume | toFix: 2 }} $</span>
+        <span><strong>Liquidity:</strong> {{ poolData.usdLiquidity | parseBigNumber }} $</span>
+        <span><strong>Volume:</strong> {{ poolData.usdVolume | parseBigNumber }} $</span>
       </div>
     </mat-card>
 
@@ -43,13 +45,29 @@
         [href]="'https://etherscan.io/address/' + poolData.exchange" target="_blank"
         class="primary-color">{{poolData.poolName || 'Nothing found'}}</a></h3>
 
-    <ng-container *ngFor="let asset of poolData.assets; let index = index">
-      <mat-form-field appearance="outline">
-        <mat-label>{{ asset.symbol }} price in USD</mat-label>
-        <input matInput type="number" [formControl]="form.get('tokens').controls[index]" autocomplete="off"
-          [min]="inputConfig[index].min" [max]="inputConfig[index].max">
-      </mat-form-field>
-    </ng-container>
+    <mat-card class="inputs">
+      <h3 class="primary-color">Final Values (During Withdraw)</h3>
+      <ng-container *ngFor="let asset of poolData.assets; let index = index">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ asset.symbol }} price in USD</mat-label>
+          <input matInput type="number" [formControl]="form.get('tokens').controls[index]" autocomplete="off"
+            [min]="inputConfig[index].min" [max]="inputConfig[index].max">
+        </mat-form-field>
+      </ng-container>
+
+      <span matTooltip="Volume During Deposit" class="tooltip">Volume: {{ form.get('volume').value | toFix }}</span>
+      <div class="row">
+        <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputConfig.volMin" [max]="inputConfig.volMax"
+          color="primary" [formControl]="form.get('volume')"></mat-slider>
+      </div>
+
+      <span matTooltip="Liquidity During Deposit" class="tooltip">Liquidity:
+        {{ form.get('liquidity').value | toFix }}</span>
+      <div class="row">
+        <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputConfig.liqMin" [max]="inputConfig.liqMax"
+          color="primary" [formControl]="form.get('liquidity')"></mat-slider>
+      </div>
+    </mat-card>
 
 
     <mat-form-field appearance="outline">
@@ -62,19 +80,6 @@
       <mat-label>Days in pool</mat-label>
       <input matInput type="number" [formControl]="form.get('days')" autocomplete="off" min="1" max="365">
     </mat-form-field>
-
-    <span matTooltip="Average Daily Volume" class="tooltip">Volume: {{ form.get('volume').value | toFix }}</span>
-    <div class="row">
-      <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputConfig.volMin" [max]="inputConfig.volMax"
-        color="primary" [formControl]="form.get('volume')"></mat-slider>
-    </div>
-
-    <span matTooltip="Liquidity in pool at the time of exit" class="tooltip">Liquidity:
-      {{ form.get('liquidity').value | toFix }}</span>
-    <div class="row">
-      <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputConfig.liqMin" [max]="inputConfig.liqMax"
-        color="primary" [formControl]="form.get('liquidity')"></mat-slider>
-    </div>
   </article>
 
 
@@ -109,9 +114,9 @@
       <tr>
         <td><strong>Impermenant Loss</strong></td>
         <td>{{ roiResult.get('impermenantLoss') }}</td>
-        <td>{{ roiResult.get('impermenantLoss') }}</td>
-        <td>{{ roiResult.get('impermenantLoss') }}</td>
-        <td>{{ roiResult.get('impermenantLoss') }}</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
       </tr>
       <mat-divider></mat-divider>
       <tr>
@@ -132,10 +137,10 @@
       <mat-divider></mat-divider>
       <tr>
         <td><strong>ROI</strong></td>
-        <td>{{ roiResult.get('roiPool') }}</td>
-        <td>{{ roiResult.get('ROIHODLTokenOne') }}</td>
-        <td>{{ roiResult.get('ROIHODLTokenTwo') }}</td>
-        <td>{{ roiResult.get('roi5050') }}</td>
+        <td>{{ roiResult.get('roiPool') }}%</td>
+        <td>{{ roiResult.get('ROIHODLTokenOne') }}%</td>
+        <td>{{ roiResult.get('ROIHODLTokenTwo') }}%</td>
+        <td>{{ roiResult.get('roi5050') }}%</td>
       </tr>
       <mat-divider></mat-divider>
     </table>

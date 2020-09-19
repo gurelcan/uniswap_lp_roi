@@ -1,6 +1,6 @@
 // Angular
 import { Component } from '@angular/core';
-import { FormControl, FormGroup, Validators, FormArray } from '@angular/forms';
+import { FormControl, FormGroup, FormArray } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Title } from '@angular/platform-browser';
 
@@ -19,7 +19,7 @@ import { BehaviorSubject, Subscription } from 'rxjs';
   }
 })
 export class AppComponent {
-  public searchCtrl = new FormControl('0x1d6432AEfeAE2c0Ff1393120541863822a4E6Fa7', Validators.pattern(/^0x[a-fA-F0-9]{40}$/g));
+  public searchCtrl = new FormControl('0x1d6432AEfeAE2c0Ff1393120541863822a4E6Fa7');
 
   public loading = new BehaviorSubject(false);
 
@@ -83,8 +83,8 @@ export class AppComponent {
           /* Set the form controls */
           this.form.get('liquidity').setValue(this.poolData.usdLiquidity);
           this.form.get('volume').setValue(this.poolData.usdVolume);
-          (this.form.get('tokens') as FormArray).push(new FormControl(this.calculateUSDValue(this.poolData.assets[0])));
-          (this.form.get('tokens') as FormArray).push(new FormControl(this.calculateUSDValue(this.poolData.assets[1])));
+          (this.form.get('tokens') as FormArray).push(new FormControl(this.calculateUSDValue(this.poolData.assets[0]).toFixed(2)));
+          (this.form.get('tokens') as FormArray).push(new FormControl(this.calculateUSDValue(this.poolData.assets[1]).toFixed(2)));
 
         } catch (error) {
           console.error('error parsing data');
@@ -164,20 +164,20 @@ export class AppComponent {
       const totalHODLTokenTwo = investment + priceAppreciationHODLTokenTwo;
       const total5050 = investment + priceAppreciationHODL5050;
 
-      this.roiResult.set('roiPool', totalPool / investment * 100);
-      this.roiResult.set('ROIHODLTokenOne', totalHODLTokenOne / investment * 100);
-      this.roiResult.set('ROIHODLTokenTwo', totalHODLTokenTwo / investment * 100);
-      this.roiResult.set('roi5050', total5050 / investment * 100);
-      this.roiResult.set('priceAppreciationForPool', priceAppreciationHODLTokenOne);
-      this.roiResult.set('priceAppreciationHODLTokenOne', priceAppreciationHODLTokenOne);
-      this.roiResult.set('priceAppreciationHODLTokenTwo', priceAppreciationHODLTokenTwo);
-      this.roiResult.set('priceAppreciationHODL5050', priceAppreciationHODL5050);
-      this.roiResult.set('fees', feesCollected);
-      this.roiResult.set('impermenantLoss', impermenantLoss);
-      this.roiResult.set('totalPool', totalPool);
-      this.roiResult.set('totalHODLTokenOne', totalHODLTokenOne);
-      this.roiResult.set('totalHODLTokenTwo', totalHODLTokenTwo);
-      this.roiResult.set('total5050', total5050);
+      this.roiResult.set('roiPool', Math.round(totalPool / investment * 100));
+      this.roiResult.set('ROIHODLTokenOne', Math.round(totalHODLTokenOne / investment * 100));
+      this.roiResult.set('ROIHODLTokenTwo', Math.round(totalHODLTokenTwo / investment * 100));
+      this.roiResult.set('roi5050', Math.round(total5050 / investment * 100));
+      this.roiResult.set('priceAppreciationForPool', Math.round(priceAppreciationForPool));
+      this.roiResult.set('priceAppreciationHODLTokenOne', Math.round(priceAppreciationHODLTokenOne));
+      this.roiResult.set('priceAppreciationHODLTokenTwo', Math.round(priceAppreciationHODLTokenTwo));
+      this.roiResult.set('priceAppreciationHODL5050', Math.round(priceAppreciationHODL5050));
+      this.roiResult.set('fees', Math.round(feesCollected));
+      this.roiResult.set('impermenantLoss', Math.round(impermenantLoss));
+      this.roiResult.set('totalPool', Math.round(totalPool));
+      this.roiResult.set('totalHODLTokenOne', Math.round(totalHODLTokenOne));
+      this.roiResult.set('totalHODLTokenTwo', Math.round(totalHODLTokenTwo));
+      this.roiResult.set('total5050', Math.round(total5050));
       /* 
             console.log(tokenOneInvested, tokenTwoInvested, CONSTANT, tokenOnePriceInTokenTwo, tokenOneLPAtExit, tokenTwoLPAtExit,
               liquidityShareAtEntry, tokenOneRemoved, liquidityShareAtExit, liquidityShareAverage, tokenTwoRemoved, volumePriceAppreciation,

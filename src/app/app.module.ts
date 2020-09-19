@@ -14,6 +14,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ConnectButtonComponent } from './components/connect-button/connect-button.component';
 import { ToFixPipe } from './pipes/toFix.pipe';
+import { ParseBigNumberPipeModule } from './pipes/parseBigNumber.pipe';
 
 // Env
 import { environment } from 'src/environments/environment';
@@ -45,6 +46,7 @@ import { MatDividerModule} from '@angular/material/divider';
     AngularFirestoreModule,
     HttpClientModule,
     ReactiveFormsModule,
+    ParseBigNumberPipeModule,
 
     // Material
     MatFormFieldModule,
