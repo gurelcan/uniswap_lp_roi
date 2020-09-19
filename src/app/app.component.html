@@ -19,13 +19,12 @@
     </ng-template>
   </article>
 
-  <!-- Inputs -->
+  <!-- Pool information -->
+
   <article class="inputs" *ngIf="showInputs.asObservable() | async">
     <mat-card>
 
-      <!-- Pool information -->
-
-      <h3 class="primary-color">Initial Values (During Deposit)</h3>
+      <h2 class="primary-color">Initial Values (During Deposit)</h2>
 
       <div class="pool-data">
         <ng-container *ngFor="let token of poolData.assets">
@@ -45,8 +44,10 @@
         [href]="'https://etherscan.io/address/' + poolData.exchange" target="_blank"
         class="primary-color">{{poolData.poolName || 'Nothing found'}}</a></h3>
 
+    <!-- Inputs -->
+
     <mat-card class="inputs">
-      <h3 class="primary-color">Final Values (During Withdraw)</h3>
+      <h2 class="primary-color">Final Values (During Withdraw)</h2>
       <ng-container *ngFor="let asset of poolData.assets; let index = index">
         <mat-form-field appearance="outline">
           <mat-label>{{ asset.symbol }} price in USD</mat-label>
@@ -55,20 +56,19 @@
         </mat-form-field>
       </ng-container>
 
-      <span matTooltip="Volume During Deposit" class="tooltip">Volume: {{ form.get('volume').value | toFix }}</span>
+      <span matTooltip="Volume During Deposit" class="tooltip">Volume: {{ form.get('volume').value | parseBigNumber }}</span>
       <div class="row">
         <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputConfig.volMin" [max]="inputConfig.volMax"
           color="primary" [formControl]="form.get('volume')"></mat-slider>
       </div>
 
       <span matTooltip="Liquidity During Deposit" class="tooltip">Liquidity:
-        {{ form.get('liquidity').value | toFix }}</span>
+        {{ form.get('liquidity').value | parseBigNumber }}</span>
       <div class="row">
         <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputConfig.liqMin" [max]="inputConfig.liqMax"
           color="primary" [formControl]="form.get('liquidity')"></mat-slider>
       </div>
     </mat-card>
-
 
     <mat-form-field appearance="outline">
       <mat-label>Investment in USD</mat-label>
@@ -82,8 +82,7 @@
     </mat-form-field>
   </article>
 
-
-  <!-- Pool information -->
+  <!-- Pool table -->
 
   <article class="pool-information" *ngIf="showInputs.asObservable() | async"
     style="width: 100%; padding: 20px; height: 300px;">

@@ -150,7 +150,7 @@ export class AppComponent {
       this.inputConfig.liqMin = this.findMaxValue(liquidityAfterAppreciation / liquidityChangeAllowedRange,
         liquidtyPriceAppreciation * investment);
       this.inputConfig.liqMax = liquidityAfterAppreciation * liquidityChangeAllowedRange;
-
+        console.log(this.inputConfig)
       /* Calculate Table */
       const priceAppreciationForPool = (tokens[0] * tokenOneInvested + tokens[1] * tokenTwoInvested) - investment;
       const priceAppreciationHODLTokenOne = (investment * tokens[0]) / this.tokenOnePriceFetched - investment;
