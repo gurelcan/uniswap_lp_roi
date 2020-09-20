@@ -19,7 +19,7 @@ import { BehaviorSubject, Subscription } from 'rxjs';
   }
 })
 export class AppComponent {
-  public searchCtrl = new FormControl('0x1d6432AEfeAE2c0Ff1393120541863822a4E6Fa7');
+  public searchCtrl = new FormControl('0x4b618087DaE7765823BC47fFbF38C8Ee8489F5CA');
 
   public loading = new BehaviorSubject(false);
 
@@ -150,7 +150,7 @@ export class AppComponent {
       this.inputConfig.liqMin = this.findMaxValue(liquidityAfterAppreciation / liquidityChangeAllowedRange,
         liquidtyPriceAppreciation * investment);
       this.inputConfig.liqMax = liquidityAfterAppreciation * liquidityChangeAllowedRange;
-        console.log(this.inputConfig)
+      console.log(this.inputConfig)
       /* Calculate Table */
       const priceAppreciationForPool = (tokens[0] * tokenOneInvested + tokens[1] * tokenTwoInvested) - investment;
       const priceAppreciationHODLTokenOne = (investment * tokens[0]) / this.tokenOnePriceFetched - investment;
@@ -173,11 +173,12 @@ export class AppComponent {
       this.roiResult.set('priceAppreciationHODLTokenTwo', Math.round(priceAppreciationHODLTokenTwo));
       this.roiResult.set('priceAppreciationHODL5050', Math.round(priceAppreciationHODL5050));
       this.roiResult.set('fees', Math.round(feesCollected));
-      this.roiResult.set('impermenantLoss', Math.round(impermenantLoss));
+      this.roiResult.set('impermenantLoss', impermenantLoss);
       this.roiResult.set('totalPool', Math.round(totalPool));
       this.roiResult.set('totalHODLTokenOne', Math.round(totalHODLTokenOne));
       this.roiResult.set('totalHODLTokenTwo', Math.round(totalHODLTokenTwo));
       this.roiResult.set('total5050', Math.round(total5050));
+
       /* 
             console.log(tokenOneInvested, tokenTwoInvested, CONSTANT, tokenOnePriceInTokenTwo, tokenOneLPAtExit, tokenTwoLPAtExit,
               liquidityShareAtEntry, tokenOneRemoved, liquidityShareAtExit, liquidityShareAverage, tokenTwoRemoved, volumePriceAppreciation,
