@@ -9,7 +9,6 @@
     <mat-form-field appearance="outline">
       <mat-label>Type in pool address</mat-label>
       <input matInput [formControl]="searchCtrl" type="text" autocomplete="off">
-      <mat-error *ngIf="searchCtrl.hasError('pattern')">This is not a valid Ethereum address</mat-error>
     </mat-form-field>
     <ng-container *ngIf="loading.asObservable() | async; else search">
       <mat-spinner color="primary"></mat-spinner>
@@ -20,23 +19,24 @@
     </ng-template>
   </article>
 
-  <!-- Inputs -->
+  <!-- Pool information -->
+
   <article class="inputs" *ngIf="showInputs.asObservable() | async">
-
-    <!-- Pool information -->
-
     <mat-card>
+
+      <h2 class="primary-color">Initial Values (During Deposit)</h2>
+
       <div class="pool-data">
         <ng-container *ngFor="let token of poolData.assets">
           <span>
             <strong>{{ token.symbol || 'No symbol provided' }}:</strong>
-            {{ (this.poolData.usdLiquidity / 2) / token.balance | toFix }} $
+            {{ (this.poolData.usdLiquidity / 2) / token.balance | toFix | number }} $
           </span>
         </ng-container>
       </div>
       <div class="pool-data">
-        <span><strong>Liquidity:</strong> {{ poolData.usdLiquidity | toFix: 2 }} $</span>
-        <span><strong>Volume:</strong> {{ poolData.usdVolume | toFix: 2 }} $</span>
+        <span><strong>Liquidity:</strong> {{ poolData.usdLiquidity | toFix |number }} $</span>
+        <span><strong>Volume:</strong> {{ poolData.usdVolume | toFix | number }} $</span>
       </div>
     </mat-card>
 
@@ -44,14 +44,32 @@
         [href]="'https://etherscan.io/address/' + poolData.exchange" target="_blank"
         class="primary-color">{{poolData.poolName || 'Nothing found'}}</a></h3>
 
-    <ng-container *ngFor="let asset of poolData.assets; let index = index">
-      <mat-form-field appearance="outline">
-        <mat-label>{{ asset.symbol }} price in USD</mat-label>
-        <input matInput type="number" [formControl]="form.get('tokens').controls[index]" autocomplete="off"
-          [min]="inputConfig[index].min" [max]="inputConfig[index].max">
-      </mat-form-field>
-    </ng-container>
+    <!-- Inputs -->
 
+    <mat-card class="inputs">
+      <h2 class="primary-color">Final Values (During Withdraw)</h2>
+      <ng-container *ngFor="let asset of poolData.assets; let index = index">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ asset.symbol }} price in USD</mat-label>
+          <input matInput type="number" [formControl]="form.get('tokens').controls[index]" autocomplete="off"
+            [min]="inputConfig[index].min" [max]="inputConfig[index].max">
+        </mat-form-field>
+      </ng-container>
+
+      <span matTooltip="Volume During Deposit" class="tooltip">Volume:
+        {{ form.get('volume').value | toFix | number }}</span>
+      <div class="row">
+        <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputConfig.volMin" [max]="inputConfig.volMax"
+          color="primary" [formControl]="form.get('volume')"></mat-slider>
+      </div>
+
+      <span matTooltip="Liquidity During Deposit" class="tooltip">Liquidity:
+        {{ form.get('liquidity').value | toFix | number }}</span>
+      <div class="row">
+        <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputConfig.liqMin" [max]="inputConfig.liqMax"
+          color="primary" [formControl]="form.get('liquidity')"></mat-slider>
+      </div>
+    </mat-card>
 
     <mat-form-field appearance="outline">
       <mat-label>Investment in USD</mat-label>
@@ -63,23 +81,9 @@
       <mat-label>Days in pool</mat-label>
       <input matInput type="number" [formControl]="form.get('days')" autocomplete="off" min="1" max="365">
     </mat-form-field>
-
-    <span matTooltip="Average Daily Volume" class="tooltip">Volume: {{ form.get('volume').value | toFix }}</span>
-    <div class="row">
-      <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputConfig.volMin" [max]="inputConfig.volMax"
-        color="primary" [formControl]="form.get('volume')"></mat-slider>
-    </div>
-
-    <span matTooltip="Liquidity in pool at the time of exit" class="tooltip">Liquidity:
-      {{ form.get('liquidity').value | toFix }}</span>
-    <div class="row">
-      <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputConfig.liqMin" [max]="inputConfig.liqMax"
-        color="primary" [formControl]="form.get('liquidity')"></mat-slider>
-    </div>
   </article>
 
-
-  <!-- Pool information -->
+  <!-- Pool table -->
 
   <article class="pool-information" *ngIf="showInputs.asObservable() | async"
     style="width: 100%; padding: 20px; height: 300px;">
@@ -93,31 +97,31 @@
       </tr>
       <tr>
         <td><strong>Invested Amount</strong></td>
-        <td>{{ form.get('investment').value }}</td>
-        <td>{{ form.get('investment').value }}</td>
-        <td>{{ form.get('investment').value }}</td>
-        <td>{{ form.get('investment').value }}</td>
+        <td>{{ form.get('investment').value | number }} </td>
+        <td>{{ form.get('investment').value | number }}</td>
+        <td>{{ form.get('investment').value | number }}</td>
+        <td>{{ form.get('investment').value | number }}</td>
       </tr>
       <mat-divider></mat-divider>
       <tr>
         <td><strong>Price Appreciation</strong></td>
-        <td>{{ roiResult.get('priceAppreciationForPool') }}</td>
-        <td>{{ roiResult.get('priceAppreciationHODLTokenOne') }}</td>
-        <td>{{ roiResult.get('priceAppreciationHODLTokenTwo') }}</td>
-        <td>{{ roiResult.get('priceAppreciationHODL5050') }}</td>
+        <td>{{ roiResult.get('priceAppreciationForPool') | number }}</td>
+        <td>{{ roiResult.get('priceAppreciationHODLTokenOne') | number }}</td>
+        <td>{{ roiResult.get('priceAppreciationHODLTokenTwo') | number }}</td>
+        <td>{{ roiResult.get('priceAppreciationHODL5050') | number }}</td>
       </tr>
       <mat-divider></mat-divider>
       <tr>
         <td><strong>Impermenant Loss</strong></td>
-        <td>{{ roiResult.get('impermenantLoss') }}</td>
-        <td>{{ roiResult.get('impermenantLoss') }}</td>
-        <td>{{ roiResult.get('impermenantLoss') }}</td>
-        <td>{{ roiResult.get('impermenantLoss') }}</td>
+        <td>{{ roiResult.get('impermenantLoss') | number }}</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
       </tr>
       <mat-divider></mat-divider>
       <tr>
         <td><strong>Fees</strong></td>
-        <td>{{ roiResult.get('fees') }}</td>
+        <td>{{ roiResult.get('fees') | number }}</td>
         <td>-</td>
         <td>-</td>
         <td>-</td>
@@ -125,18 +129,18 @@
       <mat-divider></mat-divider>
       <tr>
         <td><strong>Total</strong></td>
-        <td>{{ roiResult.get('totalPool') }}</td>
-        <td>{{ roiResult.get('totalHODLTokenOne') }}</td>
-        <td>{{ roiResult.get('totalHODLTokenTwo') }}</td>
-        <td>{{ roiResult.get('total5050') }}</td>
+        <td>{{ roiResult.get('totalPool') | number }}</td>
+        <td>{{ roiResult.get('totalHODLTokenOne') | number }}</td>
+        <td>{{ roiResult.get('totalHODLTokenTwo') | number }}</td>
+        <td>{{ roiResult.get('total5050') | number }}</td>
       </tr>
       <mat-divider></mat-divider>
       <tr>
         <td><strong>ROI</strong></td>
-        <td>{{ roiResult.get('roiPool') }}</td>
-        <td>{{ roiResult.get('ROIHODLTokenOne') }}</td>
-        <td>{{ roiResult.get('ROIHODLTokenTwo') }}</td>
-        <td>{{ roiResult.get('roi5050') }}</td>
+        <td>{{ roiResult.get('roiPool') | number }}%</td>
+        <td>{{ roiResult.get('ROIHODLTokenOne') | number }}%</td>
+        <td>{{ roiResult.get('ROIHODLTokenTwo') | number }}%</td>
+        <td>{{ roiResult.get('roi5050') | number }}%</td>
       </tr>
       <mat-divider></mat-divider>
     </table>
