@@ -73,7 +73,7 @@ export class AppComponent {
     const poolAPI = this.poolService.fetchPool();
     this.sub = poolAPI.subscribe(async data => {
       this.poolData = data.results.filter(x => x.exchange === this.searchCtrl.value.toLowerCase())[0];
-      console.log()
+
       if (!this.poolData) {
         this.snackbar.open('Did not found any pool for the address');
         this.loading.next(false);
@@ -88,8 +88,6 @@ export class AppComponent {
 
         } catch (error) {
           console.error('error parsing data');
-          console.error(error);
-          console.error(this.poolData);
           this.loading.next(false);
           this.showInputs.next(false);
         }
@@ -150,7 +148,7 @@ export class AppComponent {
       this.inputConfig.liqMin = this.findMaxValue(liquidityAfterAppreciation / liquidityChangeAllowedRange,
         liquidtyPriceAppreciation * investment);
       this.inputConfig.liqMax = liquidityAfterAppreciation * liquidityChangeAllowedRange;
-      console.log(this.inputConfig)
+
       /* Calculate Table */
       const priceAppreciationForPool = (tokens[0] * tokenOneInvested + tokens[1] * tokenTwoInvested) - investment;
       const priceAppreciationHODLTokenOne = (investment * tokens[0]) / this.tokenOnePriceFetched - investment;

@@ -3,6 +3,9 @@
     {
       "target": "uniswap-roi",
       "public": "dist/uniswap-roi",
+      "predeploy": [
+        "ng build uniswap-roi --prod"
+      ],
       "ignore": [
         "**/.*"
       ],
