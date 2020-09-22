@@ -9,6 +9,10 @@ import { PoolService } from './services/pool.service';
 
 // RxJs
 import { BehaviorSubject, Subscription } from 'rxjs';
+import { distinctUntilChanged } from 'rxjs/operators';
+
+// Lodash
+import { isEqual } from 'lodash';
 
 @Component({
   selector: 'app-root',
@@ -19,7 +23,7 @@ import { BehaviorSubject, Subscription } from 'rxjs';
   }
 })
 export class AppComponent {
-  public searchCtrl = new FormControl('0x0e4dAdf1Ba9AEe6379129bae2fCb09F1b385e7ef');
+  public searchCtrl = new FormControl('0x05cDe89cCfa0adA8C88D5A23caaa79Ef129E7883');
 
   public loading = new BehaviorSubject(false);
 
@@ -48,15 +52,19 @@ export class AppComponent {
 
   private sub: Subscription;
 
+  private shouldUpdateSliders = true;
+
   constructor(
     private poolService: PoolService,
     private snackbar: MatSnackBar,
     private title: Title) {
     this.title.setTitle('Uniswap ROI');
 
-    this.form.valueChanges.subscribe(_ => {
-      this.calculateROI();
-    });
+    this.form.valueChanges.pipe(distinctUntilChanged((prev, cur) => {
+      this.shouldUpdateSliders = prev.liquidity === cur.liquidity && prev.volume === cur.volume;
+      return isEqual(prev, cur);
+    })).subscribe(_ => this.calculateROI(this.shouldUpdateSliders));
+
   }
 
   searchPool(): void {
@@ -72,7 +80,7 @@ export class AppComponent {
     /* Fetching and parsing data */
     this.sub = this.poolService.fetchPool().subscribe(async data => {
 
-      this.poolData = data.results.filter(x => x.exchange === this.searchCtrl.value.toLowerCase())[0];
+      this.poolData = data.results.filter(x => x.exchange.toLowerCase() === this.searchCtrl.value.toLowerCase().trim())[0];
 
       this.updateData();
 
@@ -91,9 +99,10 @@ export class AppComponent {
         /* Set the form controls */
         this.form.get('liquidity').setValue(this.poolData.usdLiquidity);
         this.form.get('volume').setValue(this.poolData.usdVolume);
-        (this.form.get('tokens') as FormArray).push(new FormControl(this.calculateUSDValue(this.poolData.assets[0]).toFixed(2)));
-        (this.form.get('tokens') as FormArray).push(new FormControl(this.calculateUSDValue(this.poolData.assets[1]).toFixed(2)));
+        (this.form.get('tokens') as FormArray).push(new FormControl(this.calculateUSDValue(this.poolData.assets[0]).toFixed(4)));
+        (this.form.get('tokens') as FormArray).push(new FormControl(this.calculateUSDValue(this.poolData.assets[1]).toFixed(4)));
 
+        this.calculateROI(true);
       } catch (error) {
         console.error('error parsing data');
         this.loading.next(false);
@@ -102,7 +111,7 @@ export class AppComponent {
     }
   }
 
-  calculateROI(): void {
+  calculateROI(updateSliders: boolean): void {
     const { investment, days, liquidity, tokens, volume } = this.form.value;
 
     if (!tokens.length) return;
@@ -187,8 +196,13 @@ export class AppComponent {
 
       this.showInputs.next(true);
       this.loading.next(false);
+
+      if (updateSliders) {
+        this.form.get('liquidity').setValue(liquidityAfterAppreciation);
+        this.form.get('volume').setValue(volumeAfterAppreciation);
+      }
+
     } catch (error) {
-      console.error(error);
       this.showInputs.next(false);
       this.loading.next(false);
     }

@@ -27,6 +27,7 @@
     "ethers": "^5.0.8",
     "firebase": "^7.13.1",
     "jsbi": "^3.1.4",
+    "lodash": "^4.17.20",
     "rxjs": "~6.6.0",
     "tiny-invariant": "^1.1.0",
     "tiny-warning": "^1.0.3",

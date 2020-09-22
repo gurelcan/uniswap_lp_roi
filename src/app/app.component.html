@@ -56,14 +56,14 @@
         </mat-form-field>
       </ng-container>
 
-      <span>Volume:
+      <span *ngIf="form.get('volume').value">Volume:
         {{ form.get('volume').value | toFix | number }}</span>
       <div class="row">
         <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputConfig.volMin" [max]="inputConfig.volMax"
           color="primary" [formControl]="form.get('volume')"></mat-slider>
       </div>
 
-      <span>
+      <span *ngIf="form.get('liquidity').value">Liquidity:
         {{ form.get('liquidity').value | toFix | number }}</span>
       <div class="row">
         <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputConfig.liqMin" [max]="inputConfig.liqMax"
