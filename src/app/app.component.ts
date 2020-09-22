@@ -19,7 +19,7 @@ import { BehaviorSubject, Subscription } from 'rxjs';
   }
 })
 export class AppComponent {
-  public searchCtrl = new FormControl('0x4b618087DaE7765823BC47fFbF38C8Ee8489F5CA');
+  public searchCtrl = new FormControl('0x0e4dAdf1Ba9AEe6379129bae2fCb09F1b385e7ef');
 
   public loading = new BehaviorSubject(false);
 
@@ -70,33 +70,36 @@ export class AppComponent {
     if (this.sub) this.sub.unsubscribe();
 
     /* Fetching and parsing data */
-    const poolAPI = this.poolService.fetchPool();
-    this.sub = poolAPI.subscribe(async data => {
+    this.sub = this.poolService.fetchPool().subscribe(async data => {
+
       this.poolData = data.results.filter(x => x.exchange === this.searchCtrl.value.toLowerCase())[0];
 
-      if (!this.poolData) {
-        this.snackbar.open('Did not found any pool for the address');
-        this.loading.next(false);
-      } else {
-        try {
+      this.updateData();
 
-          /* Set the form controls */
-          this.form.get('liquidity').setValue(this.poolData.usdLiquidity);
-          this.form.get('volume').setValue(this.poolData.usdVolume);
-          (this.form.get('tokens') as FormArray).push(new FormControl(this.calculateUSDValue(this.poolData.assets[0]).toFixed(2)));
-          (this.form.get('tokens') as FormArray).push(new FormControl(this.calculateUSDValue(this.poolData.assets[1]).toFixed(2)));
-
-        } catch (error) {
-          console.error('error parsing data');
-          this.loading.next(false);
-          this.showInputs.next(false);
-        }
-      }
-    }, (error: Error) => {
+    }, () => {
       this.showInputs.next(false);
       this.loading.next(false);
-      console.error(error);
     });
+  }
+
+  updateData(): void {
+    if (!this.poolData) {
+      this.snackbar.open('Did not found any pool for the address', '', { duration: 3000 });
+      this.loading.next(false);
+    } else {
+      try {
+        /* Set the form controls */
+        this.form.get('liquidity').setValue(this.poolData.usdLiquidity);
+        this.form.get('volume').setValue(this.poolData.usdVolume);
+        (this.form.get('tokens') as FormArray).push(new FormControl(this.calculateUSDValue(this.poolData.assets[0]).toFixed(2)));
+        (this.form.get('tokens') as FormArray).push(new FormControl(this.calculateUSDValue(this.poolData.assets[1]).toFixed(2)));
+
+      } catch (error) {
+        console.error('error parsing data');
+        this.loading.next(false);
+        this.showInputs.next(false);
+      }
+    }
   }
 
   calculateROI(): void {
@@ -171,7 +174,7 @@ export class AppComponent {
       this.roiResult.set('priceAppreciationHODLTokenTwo', Math.round(priceAppreciationHODLTokenTwo));
       this.roiResult.set('priceAppreciationHODL5050', Math.round(priceAppreciationHODL5050));
       this.roiResult.set('fees', Math.round(feesCollected));
-      this.roiResult.set('impermenantLoss', impermenantLoss);
+      this.roiResult.set('impermenantLoss', Math.round(impermenantLoss));
       this.roiResult.set('totalPool', Math.round(totalPool));
       this.roiResult.set('totalHODLTokenOne', Math.round(totalHODLTokenOne));
       this.roiResult.set('totalHODLTokenTwo', Math.round(totalHODLTokenTwo));
@@ -207,27 +210,6 @@ export class AppComponent {
     const usdPrice = (this.poolData.usdLiquidity / 2) / (asset.balance);
     return usdPrice;
   }
-
-  /*  public async fetchPrice(): Promise<any> {
-     const contract = new Contract(this.poolData.exchange, UniswapV2Pair.abi, this.provider);
-     const [reserves0, reserves1] = await contract.getReserves()
-     const parseReserves0 = utils.formatUnits(reserves0, 18);
-     const kLast = await contract.kLast();
-     console.log(this.getLiquidityValue(new Token(1, this.poolData.assets[0].address, 18),
-       new TokenAmount(new Token(1, this.poolData.assets[0].address, 18), reserves1),
-       new TokenAmount(new Token(1, this.poolData.assets[0].address, 18), reserves0),
-       false,
-       kLast
-     ))
-     return ' cool'; */
-  /*     const erc20 = new Contract(address, ['function decimals() view returns (uint8)'], this.provider);
-      const decimals = await erc20.decimals();
-      const networkId = 1;
-      const tokenOne = new Token(networkId, address, decimals);
-      const tokenTwo = new Token(networkId, '0x6b175474e89094c44da98b954eedeac495271d0f', 18);
-      const pair = await Fetcher.fetchPairData(tokenTwo, tokenOne, this.provider);
-      const route = new Route([pair], tokenTwo);
-      return route; */
 
   private findMaxValue(one: number, two: number): number {
     return one >= two ? one : two;
