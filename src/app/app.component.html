@@ -56,14 +56,14 @@
         </mat-form-field>
       </ng-container>
 
-      <span matTooltip="Volume During Deposit" class="tooltip">Volume:
+      <span>Volume:
         {{ form.get('volume').value | toFix | number }}</span>
       <div class="row">
         <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputConfig.volMin" [max]="inputConfig.volMax"
           color="primary" [formControl]="form.get('volume')"></mat-slider>
       </div>
 
-      <span matTooltip="Liquidity During Deposit" class="tooltip">Liquidity:
+      <span>
         {{ form.get('liquidity').value | toFix | number }}</span>
       <div class="row">
         <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputConfig.liqMin" [max]="inputConfig.liqMax"

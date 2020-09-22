@@ -19,7 +19,7 @@ import { BehaviorSubject, Subscription } from 'rxjs';
   }
 })
 export class AppComponent {
-  public searchCtrl = new FormControl('0x4b618087DaE7765823BC47fFbF38C8Ee8489F5CA');
+  public searchCtrl = new FormControl('0x0e4dAdf1Ba9AEe6379129bae2fCb09F1b385e7ef');
 
   public loading = new BehaviorSubject(false);
 
@@ -171,7 +171,7 @@ export class AppComponent {
       this.roiResult.set('priceAppreciationHODLTokenTwo', Math.round(priceAppreciationHODLTokenTwo));
       this.roiResult.set('priceAppreciationHODL5050', Math.round(priceAppreciationHODL5050));
       this.roiResult.set('fees', Math.round(feesCollected));
-      this.roiResult.set('impermenantLoss', impermenantLoss);
+      this.roiResult.set('impermenantLoss', Math.round(impermenantLoss));
       this.roiResult.set('totalPool', Math.round(totalPool));
       this.roiResult.set('totalHODLTokenOne', Math.round(totalHODLTokenOne));
       this.roiResult.set('totalHODLTokenTwo', Math.round(totalHODLTokenTwo));
