@@ -2,7 +2,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NgModule } from '@angular/core';
+import { ErrorHandler, NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 
 // Fire
@@ -30,7 +30,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCardModule } from '@angular/material/card';
-import { MatDividerModule} from '@angular/material/divider';
+import { MatDividerModule } from '@angular/material/divider';
+import { MyErrorHandler } from './services/error.service';
 
 @NgModule({
   declarations: [
@@ -61,6 +62,12 @@ import { MatDividerModule} from '@angular/material/divider';
     MatCardModule,
     MatDividerModule
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  providers: [
+    {
+      provide: ErrorHandler,
+      useClass: MyErrorHandler,
+    },
+  ],
 })
 export class AppModule { }

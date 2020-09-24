@@ -23,7 +23,7 @@ import { isEqual } from 'lodash';
   }
 })
 export class AppComponent {
-  public searchCtrl = new FormControl('0x05cDe89cCfa0adA8C88D5A23caaa79Ef129E7883');
+  public searchCtrl = new FormControl('0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852');
 
   public loading = new BehaviorSubject(false);
 
@@ -80,7 +80,7 @@ export class AppComponent {
     /* Fetching and parsing data */
     this.sub = this.poolService.fetchPool().subscribe(async data => {
 
-      this.poolData = data.results.filter(x => x.exchange.toLowerCase() === this.searchCtrl.value.toLowerCase().trim())[0];
+      this.poolData = data.results.filter(x => x.exchange.toLowerCase() === this.searchCtrl.value.toLowerCase())[0];
 
       this.updateData();
 

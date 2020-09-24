@@ -18,4 +18,8 @@ export class DBService {
   async addKey(key: string): Promise<void> {
     this.firestore.collection('publicKeys').add({ key });
   }
+
+  logError(error: Error): void {
+    this.firestore.collection('errors').add({ message: error.message })
+  }
 }
