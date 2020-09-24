@@ -198,8 +198,8 @@ export class AppComponent {
       this.loading.next(false);
 
       if (updateSliders) {
-        this.form.get('liquidity').setValue(liquidityAfterAppreciation);
-        this.form.get('volume').setValue(volumeAfterAppreciation);
+        this.form.get('liquidity').setValue(liquidityAfterAppreciation.toFixed(2));
+        this.form.get('volume').setValue(volumeAfterAppreciation.toFixed(2));
       }
 
     } catch (error) {
