@@ -1,0 +1,23 @@
+<section [formGroup]="searchForm">
+  <mat-slide-toggle formControlName="searchBySymbols" color="primary">
+    {{ searchForm.get('searchBySymbols').value ? 'Search by Tokens' : 'Search by Pool Address' }}
+  </mat-slide-toggle>
+  <div *ngIf="searchForm.get('searchBySymbols').value; else poolAddress">
+    <app-token [control]="searchForm.get('tokenOne')"></app-token>
+    &
+    <app-token [control]="searchForm.get('tokenTwo')"></app-token>
+  </div>
+  <ng-template #poolAddress>
+    <mat-form-field appearance="outline">
+      <mat-label>Type in pool address</mat-label>
+      <input matInput formControlName="poolAddress" type="text" autocomplete="off">
+    </mat-form-field>
+  </ng-template>
+  <ng-container *ngIf="loading | async; else search">
+    <mat-spinner color="primary"></mat-spinner>
+  </ng-container>
+  <ng-template #search>
+    <button mat-raised-button color="primary" (click)="fetchPool()">Search for Pool <mat-icon>search</mat-icon>
+    </button>
+  </ng-template>
+</section>

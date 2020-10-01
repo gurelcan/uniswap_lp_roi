@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 // Ethers
-import { providers } from 'ethers'
+import { providers } from 'ethers';
 
 // RxJs
 import { BehaviorSubject } from 'rxjs';
@@ -11,10 +11,9 @@ import { DBService } from './db.service';
 export class Web3Service {
   private provider: providers.Web3Provider;
 
-  public isConnected = new BehaviorSubject(false);
+  public isConnected$ = new BehaviorSubject(false);
 
   constructor(private db: DBService) { }
-
 
   get ethereum(): any {
     return (window as any).ethereum;
@@ -24,7 +23,7 @@ export class Web3Service {
     if (this.ethereum) {
       await this.ethereum.enable();
       this.provider = new providers.Web3Provider(this.ethereum);
-      this.isConnected.next(true);
+      this.isConnected$.next(true);
       const address = await this.getAddress();
       const exists = await this.db.keyExists(address);
       if (!exists) {
@@ -35,7 +34,7 @@ export class Web3Service {
 
   disconnect(): void {
     delete this.provider;
-    this.isConnected.next(false);
+    this.isConnected$.next(false);
   }
 
   private async getAddress(): Promise<string> {

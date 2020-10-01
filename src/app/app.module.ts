@@ -4,20 +4,24 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ErrorHandler, NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
 
 // Fire
 import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 
 // App
-import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { TokenComponent } from './components/token/token.component';
 import { ConnectButtonComponent } from './components/connect-button/connect-button.component';
-import { ToFixPipe } from './pipes/toFix.pipe';
-import { ParseBigNumberPipeModule } from './pipes/parseBigNumber.pipe';
+import { SearchBarComponent } from './components/search-bar/search-bar.component';
+import { PoolInformationComponent } from './components/pool-information/pool-information.component';
 
 // Env
 import { environment } from 'src/environments/environment';
+
+// Service
+import { MyErrorHandler } from './services/error.service';
 
 // Material
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -31,23 +35,26 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
-import { MyErrorHandler } from './services/error.service';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 @NgModule({
   declarations: [
     AppComponent,
     ConnectButtonComponent,
-    ToFixPipe
+    TokenComponent,
+    SearchBarComponent,
+    PoolInformationComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,
+    RouterModule,
     BrowserAnimationsModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
     AngularFirestoreModule,
     HttpClientModule,
     ReactiveFormsModule,
-    ParseBigNumberPipeModule,
 
     // Material
     MatFormFieldModule,
@@ -60,7 +67,10 @@ import { MyErrorHandler } from './services/error.service';
     MatSnackBarModule,
     MatTooltipModule,
     MatCardModule,
-    MatDividerModule
+    MatDividerModule,
+    MatSlideToggleModule,
+    MatAutocompleteModule,
+    MatExpansionModule
   ],
   bootstrap: [AppComponent],
   providers: [

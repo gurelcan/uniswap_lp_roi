@@ -8,7 +8,7 @@ import { Web3Service } from '../../services/web3.service';
 })
 export class ConnectButtonComponent {
 
-  public isConnected = this.web3Service.isConnected;
+  public isConnected = this.web3Service.isConnected$;
 
   constructor(private web3Service: Web3Service) { }
 

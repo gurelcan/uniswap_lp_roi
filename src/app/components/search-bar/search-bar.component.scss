@@ -1,0 +1,21 @@
+section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+
+  mat-slide-toggle {
+    margin: 10px;
+  }
+
+  div {
+    app-token {
+      margin: 10px;
+    }
+  }
+
+  button {
+    margin: 25px;
+  }
+}
