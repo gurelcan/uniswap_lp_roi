@@ -51,7 +51,6 @@ export class PoolService {
             symbol
             decimals
             }
-            totalSupply
             reserveUSD
             volumeUSD
             reserve0
@@ -62,6 +61,7 @@ export class PoolService {
   }
 
   fetchPool(tokenAddressOne: string, tokenAddressTwo?: string) {
+    this.poolStore.reset();
     this.poolStore.setLoading(true);
     const query = this.createQuery(tokenAddressOne, tokenAddressTwo);
     const opts = {
@@ -86,8 +86,7 @@ export class PoolService {
             symbol: value.token1.symbol,
             priceUSD: value.reserveUSD / 2 / value.reserve1
           },
-          totalSupply: value.totalSupply,
-          reserveUSD: value.reserveUSD,
+          liquidity: Math.round(value.reserveUSD),
           volumeUSD: Math.round(value.volumeUSD)
         });
         console.log(this.poolStore.getValue());

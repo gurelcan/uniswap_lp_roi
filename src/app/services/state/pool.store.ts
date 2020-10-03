@@ -16,8 +16,7 @@ export interface PoolState {
   token0: Token;
   token1: Token;
   roi: Record<string, number>;
-  totalSupply: number;
-  reserveUSD: number;
+  liquidity: number;
   volumeUSD: number;
   isConnected: boolean;
 }
@@ -37,14 +36,13 @@ const initPoolState: PoolState = {
     priceUSD: 0
   },
   roi: {},
-  totalSupply: 0,
-  reserveUSD: 0,
+  liquidity: 0,
   volumeUSD: 0,
   isConnected: false
 };
 
 @Injectable({ providedIn: 'root' })
-@StoreConfig({ name: 'pool' })
+@StoreConfig({ name: 'pool', resettable: true })
 export class PoolStore extends Store<PoolState> {
   constructor() {
     super(initPoolState);

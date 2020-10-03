@@ -1,5 +1,5 @@
-<h3>👉 <a mat-button [href]="'https://etherscan.io/address/' + (poolAddress | async)" target="_blank"
-    class="primary-color">{{'Nothing found'}}</a></h3>
+<h3>👉 <a mat-button [href]="'https://uniswap.info/pair/' + (poolAddress | async)" target="_blank"
+    class="primary-color">{{ (tokenOne$ | async).symbol }} - {{ (tokenTwo$ | async).symbol }} Uniswap v2 Pool </a></h3>
 
 <mat-accordion multi>
 
@@ -12,7 +12,7 @@
       </mat-panel-title>
     </mat-expansion-panel-header>
 
-    <div fxLayout fxLayoutAlign="center start " fxLayoutGap="20px">
+    <div fxLayout fxLayoutAlign="space-evenly start" fxLayoutGap="20px">
       <div fxLayout="column" fxLayoutAlign="center center">
         <ng-container *ngIf="tokenOne$ | async as token">
           <strong>{{ token.symbol || 'No symbol provided' }}</strong>
@@ -29,6 +29,10 @@
         <strong>Volume</strong>
         <span>{{ volume | async | number }} $</span>
       </div>
+      <div fxLayout="column" fxLayoutAlign="center center">
+        <strong>Liquidity</strong>
+        <span>{{ liquidity | async | number }} $</span>
+      </div>
     </div>
 
   </mat-expansion-panel>
@@ -44,7 +48,7 @@
 
     <h3>Choose final values during withdraw from pool</h3>
 
-    <article fxLayoutAlign="start center" fxLayout="column">
+    <article fxLayoutAlign="start center" fxLayout="column" fxLayoutGap="15px">
       <div fxLayout fxLayoutAlign="center start" fxLayoutGap="20px">
         <ng-container *ngIf="tokenOne$ | async as token">
           <mat-form-field appearance="outline">
@@ -60,13 +64,17 @@
         </ng-container>
       </div>
 
-      <span>Volume</span>
-      <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000" min="1" max="100000" color="primary">
+      <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000" min="1" max="9999999999" color="primary"
+        [formControl]="form.get('volume')">
       </mat-slider>
+      <span>Volume: {{form.get('volume').value | number}}</span>
 
-      <span>Liquidity</span>
-      <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000" min="1" max="100000" color="primary">
+      <mat-divider></mat-divider>
+
+      <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000" min="1" max="9999999999" color="primary"
+        [formControl]="form.get('liquidity')">
       </mat-slider>
+      <span>Liquidity:{{form.get('liquidity').value | number}}</span>
 
       <div fxLayout fxLayoutAlign="center start" fxLayoutGap="20px">
         <mat-form-field appearance="outline">

@@ -16,8 +16,8 @@ export class PoolInformationComponent {
     tokenTwo: new FormControl(),
     volume: new FormControl(),
     liquidity: new FormControl(),
-    investment: new FormControl(),
-    days: new FormControl()
+    investment: new FormControl(1000),
+    days: new FormControl(30)
   });
 
   tokenOne$ = this.query.select('token0');
@@ -28,13 +28,20 @@ export class PoolInformationComponent {
 
   volume = this.query.select('volumeUSD');
 
+  liquidity = this.query.select('liquidity');
+
   isConnected$ = this.query.select('isConnected');
 
   @Input() set shouldOpen(value: boolean) {
     value ? setTimeout(() => this.accordion.openAll(), 100) : null;
   }
 
-  constructor(private query: PoolQuery) { }
+  constructor(private query: PoolQuery) {
+    this.form.get('tokenOne').setValue(this.query.getValue().token0.priceUSD.toFixed(2));
+    this.form.get('tokenTwo').setValue(this.query.getValue().token1.priceUSD.toFixed(2));
+    this.form.get('volume').setValue(Math.round(this.query.getValue().volumeUSD));
+    this.form.get('liquidity').setValue(Math.round(this.query.getValue().liquidity));
+  }
 
   formatLabel(value: number): string | number {
     if (value >= 1000000) {
@@ -46,5 +53,9 @@ export class PoolInformationComponent {
     }
 
     return value;
+  }
+
+  private calculateROI() {
+
   }
 }

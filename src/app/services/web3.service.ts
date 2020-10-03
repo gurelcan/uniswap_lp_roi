@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { providers } from 'ethers';
+import { Contract, providers } from 'ethers';
 import { DBService } from './db.service';
-import { PoolStore } from './state/pool.store';
+import { PoolStore, Token } from './state/pool.store';
 
 @Injectable({ providedIn: 'root' })
 export class Web3Service {

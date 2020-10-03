@@ -21,9 +21,17 @@ export class SearchBarComponent {
 
   constructor(private poolService: PoolService, private query: PoolQuery) { }
 
-  fetchPool() {
-    this.searchForm.value.searchBySymbols
-      ? this.poolService.fetchPool(this.searchForm.value.tokenOne.address, this.searchForm.value.tokenTwo.address)
-      : this.poolService.fetchPool(this.searchForm.value.poolAddress);
+  async fetchPool() {
+    if (this.searchForm.value.searchBySymbols) {
+      this.poolService.fetchPool(this.searchForm.value.tokenOne?.address
+        ? this.searchForm.value.tokenOne.address
+        : this.searchForm.value.tokenOne.trim(),
+        this.searchForm.value.tokenTwo?.address
+          ? this.searchForm.value.tokenTwo.address
+          : this.searchForm.value.tokenTwo.trim());
+    } else {
+      this.poolService.fetchPool(this.searchForm.value.poolAddress);
+
+    }
   }
 }
