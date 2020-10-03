@@ -1,7 +1,6 @@
 import { Component, Input, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatAccordion } from '@angular/material/expansion';
-import { combineLatest } from 'rxjs';
 import { PoolQuery } from 'src/app/services/state/pool.query';
 
 @Component({
@@ -12,8 +11,6 @@ import { PoolQuery } from 'src/app/services/state/pool.query';
 export class PoolInformationComponent {
   @ViewChild(MatAccordion) accordion: MatAccordion;
 
-  poolAddress = this.query.select('address');
-
   form = new FormGroup({
     tokenOne: new FormControl(),
     tokenTwo: new FormControl(),
@@ -23,10 +20,18 @@ export class PoolInformationComponent {
     days: new FormControl()
   });
 
-  tokens = combineLatest([this.query.select('token0'), this.query.select('token1')]);
+  tokenOne$ = this.query.select('token0');
 
-  @Input() shouldOpen(value: boolean) {
-    value ? this.accordion.openAll() : null;
+  tokenTwo$ = this.query.select('token1');
+
+  poolAddress = this.query.select('address');
+
+  volume = this.query.select('volumeUSD');
+
+  isConnected$ = this.query.select('isConnected');
+
+  @Input() set shouldOpen(value: boolean) {
+    value ? setTimeout(() => this.accordion.openAll(), 100) : null;
   }
 
   constructor(private query: PoolQuery) { }

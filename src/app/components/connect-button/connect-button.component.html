@@ -1,4 +1,4 @@
-<ng-container *ngIf="!(isConnected.asObservable() | async); else connected">
+<ng-container *ngIf="!(isConnected | async); else connected">
   <button mat-raised-button color="primary" (click)="connect()">Connect Wallet <mat-icon>account_balance_wallet
     </mat-icon></button>
 </ng-container>

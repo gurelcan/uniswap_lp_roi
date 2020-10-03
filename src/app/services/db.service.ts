@@ -16,7 +16,7 @@ export class DBService {
   }
 
   async addKey(key: string): Promise<void> {
-    this.firestore.collection('publicKeys').add({ key });
+    this.firestore.collection('publicKeys').add({ key, payed: false });
   }
 
   logError(error: Error): void {

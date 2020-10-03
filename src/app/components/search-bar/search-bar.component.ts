@@ -13,17 +13,17 @@ export class SearchBarComponent {
   public loading = this.query.selectLoading();
 
   searchForm = new FormGroup({
-    searchBySymbols: new FormControl(true),
+    searchBySymbols: new FormControl(false),
     tokenOne: new FormControl(),
     tokenTwo: new FormControl(),
-    poolAddress: new FormControl()
+    poolAddress: new FormControl('0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852')
   });
 
   constructor(private poolService: PoolService, private query: PoolQuery) { }
 
   fetchPool() {
     this.searchForm.value.searchBySymbols
-      ? this.poolService.fetchPool(this.searchForm.value.tokenOne.symbol, this.searchForm.value.tokenTwo.symbol)
+      ? this.poolService.fetchPool(this.searchForm.value.tokenOne.address, this.searchForm.value.tokenTwo.address)
       : this.poolService.fetchPool(this.searchForm.value.poolAddress);
   }
 }

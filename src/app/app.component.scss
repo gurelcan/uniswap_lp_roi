@@ -41,33 +41,9 @@ mat-spinner {
   align-self: center;
 }
 
-.row {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  mat-form-field {
-    width: 100%;
-  }
-}
 
 h3 {
   text-align: center;
-}
-
-mat-card {
-  margin-bottom: 20px;
-
-  .pool-data {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    span {
-      margin: 10px;
-    }
-  }
 }
 
 table {

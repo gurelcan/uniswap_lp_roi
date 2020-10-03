@@ -7,6 +7,8 @@
 
   <app-search-bar></app-search-bar>
 
-  <app-pool-information *ngIf="!!(showInputs$ | async)"></app-pool-information>
+  <ng-container *ngIf="!!(showInputs$ | async)">
+    <app-pool-information [shouldOpen]="true"></app-pool-information>
+  </ng-container>
 
 </main>

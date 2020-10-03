@@ -1,3 +1,6 @@
+<h3>👉 <a mat-button [href]="'https://etherscan.io/address/' + (poolAddress | async)" target="_blank"
+    class="primary-color">{{'Nothing found'}}</a></h3>
+
 <mat-accordion multi>
 
   <!-- Pool Information -->
@@ -9,15 +12,23 @@
       </mat-panel-title>
     </mat-expansion-panel-header>
 
-    <ng-container *ngFor="let token of tokens | async">
-      <span>
-        <strong>{{ token.symbol || 'No symbol provided' }}:</strong>
-        <!--    {{ (this.poolData.usdLiquidity / 2) / token.balance | toFix | number }} $ -->
-      </span>
-    </ng-container>
-    <div class="pool-data">
-      <!--   <span><strong>Liquidity:</strong> {{ poolData.usdLiquidity | toFix |number }} $</span>
-      <span><strong>Volume:</strong> {{ poolData.usdVolume | toFix | number }} $</span> -->
+    <div fxLayout fxLayoutAlign="center start " fxLayoutGap="20px">
+      <div fxLayout="column" fxLayoutAlign="center center">
+        <ng-container *ngIf="tokenOne$ | async as token">
+          <strong>{{ token.symbol || 'No symbol provided' }}</strong>
+          <span>{{ token.priceUSD | number }}$</span>
+        </ng-container>
+      </div>
+      <div fxLayout="column" fxLayoutAlign="center center">
+        <ng-container *ngIf="tokenTwo$ | async as token">
+          <strong>{{ token.symbol || 'No symbol provided' }}</strong>
+          <span>{{ token.priceUSD | number }}$</span>
+        </ng-container>
+      </div>
+      <div fxLayout="column" fxLayoutAlign="center center">
+        <strong>Volume</strong>
+        <span>{{ volume | async | number }} $</span>
+      </div>
     </div>
 
   </mat-expansion-panel>
@@ -27,50 +38,48 @@
   <mat-expansion-panel>
     <mat-expansion-panel-header>
       <mat-panel-title>
-        User Inputs
+        User Specification
       </mat-panel-title>
     </mat-expansion-panel-header>
 
-    <h3>👉 <a mat-button [href]="'https://etherscan.io/address/' + (poolAddress | async)" target="_blank"
-        class="primary-color">{{'Nothing found'}}</a></h3>
+    <h3>Choose final values during withdraw from pool</h3>
 
-    <mat-card>
-      <h2 class="primary-color">Final Values (During Withdraw)</h2>
-      <ng-container>
-        <!--     <mat-form-field appearance="outline">
-          <mat-label>{{ asset.symbol }} price in USD</mat-label>
-          <input matInput type="number" [formControl]="form.get('tokens').controls[index]" autocomplete="off"
-            [min]="inputConfig[index].min" [max]="inputConfig[index].max">
-        </mat-form-field> -->
-      </ng-container>
-
-      <div class="row">
-        <!--      <mat-form-field appearance="outline">
-          <mat-label>Volume</mat-label>
-          <input matInput [formControl]="form.get('volume')" type="number" [min]="inputConfig.volMin"
-            [max]="inputConfig.volMax">
-        </mat-form-field> -->
+    <article fxLayoutAlign="start center" fxLayout="column">
+      <div fxLayout fxLayoutAlign="center start" fxLayoutGap="20px">
+        <ng-container *ngIf="tokenOne$ | async as token">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ token.symbol }} price in USD</mat-label>
+            <input matInput type="number" [formControl]="form.get('tokenOne')" autocomplete="off">
+          </mat-form-field>
+        </ng-container>
+        <ng-container *ngIf="tokenTwo$ | async as token">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ token.symbol }} price in USD</mat-label>
+            <input matInput type="number" [formControl]="form.get('tokenTwo')" autocomplete="off">
+          </mat-form-field>
+        </ng-container>
       </div>
 
-      <div class="row">
-        <!--     <mat-form-field appearance="outline">
-          <mat-label>Liquidity</mat-label>
-          <input matInput [formControl]="form.get('liquidity')" type="number" [min]="inputConfig.liqMin"
-            [max]="inputConfig.liqMax">
-        </mat-form-field> -->
+      <span>Volume</span>
+      <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000" min="1" max="100000" color="primary">
+      </mat-slider>
+
+      <span>Liquidity</span>
+      <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000" min="1" max="100000" color="primary">
+      </mat-slider>
+
+      <div fxLayout fxLayoutAlign="center start" fxLayoutGap="20px">
+        <mat-form-field appearance="outline">
+          <mat-label>Investment in USD</mat-label>
+          <input matInput type="number" [formControl]="form.get('investment')" autocomplete="off">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Days in pool</mat-label>
+          <input matInput type="number" [formControl]="form.get('days')" autocomplete="off" min="1" max="365">
+        </mat-form-field>
       </div>
-    </mat-card>
-
-    <!--     <mat-form-field appearance="outline">
-      <mat-label>Investment in USD</mat-label>
-      <input matInput type="number" [formControl]="form.get('investment')" autocomplete="off" min="1"
-        [max]="poolData.usdLiquidity * 2">
-    </mat-form-field> -->
-
-    <mat-form-field appearance="outline">
-      <mat-label>Days in pool</mat-label>
-      <input matInput type="number" [formControl]="form.get('days')" autocomplete="off" min="1" max="365">
-    </mat-form-field>
+    </article>
   </mat-expansion-panel>
 
   <mat-expansion-panel>
@@ -80,13 +89,15 @@
       </mat-panel-title>
     </mat-expansion-panel-header>
 
-    <!--     <article class="pool-information" style="width: 100%; padding: 20px; height: 300px;">
-      <table>
-        <tr>
-          <th></th>
-          <th>Pool</th>
-          <th>HODL Token</th>
-          <th>HODL Token2</th>
+    <ng-container *ngIf="isConnected$ | async; else connect">
+
+      <!--     <article class="pool-information" style="width: 100%; padding: 20px; height: 300px;">
+        <table>
+          <tr>
+            <th></th>
+            <th>Pool</th>
+            <th>HODL Token</th>
+            <th>HODL Token2</th>
           <th>HODL 50% - 50%</th>
         </tr>
         <tr>
@@ -139,5 +150,13 @@
         <mat-divider></mat-divider>
       </table>
     </article> -->
+
+    </ng-container>
+    <ng-template #connect>
+      <h3>Connect to Meta Mask to see your results</h3>
+      <div fxLayout fxLayoutAlign="center start">
+        <app-connect-button></app-connect-button>
+      </div>
+    </ng-template>
   </mat-expansion-panel>
 </mat-accordion>

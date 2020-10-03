@@ -1,7 +1,7 @@
 import { Token } from '../app/services/state/pool.store';
 
 
-export const tokenDictionary: Record<string, Token[]> = {
+export const tokenDictionary: Record<string, any[]> = {
   rinkeby: [
     {
       "address": "0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa",

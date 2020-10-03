@@ -1,10 +1,5 @@
 // Angular
 import { Component, HostBinding } from '@angular/core';
-import { FormControl, FormGroup, FormArray } from '@angular/forms';
-import { Title } from '@angular/platform-browser';
-
-// RxJs
-import { BehaviorSubject } from 'rxjs';
 import { PoolQuery } from './services/state/pool.query';
 
 @Component({
@@ -24,12 +19,7 @@ export class AppComponent {
     0: { min: 0, max: 1000 }, 1: { min: 0, max: 1000 }
   };
 
-  constructor(
-    private title: Title,
-    private query: PoolQuery) {
-    this.title.setTitle('Uniswap ROI');
-
-  }
+  constructor(private query: PoolQuery) { }
 
   /*   calculateROI(updateSliders: boolean): void {
       const { investment, days, liquidity, tokens, volume } = this.form.value;
