@@ -31,7 +31,7 @@
       </div>
       <div fxLayout="column" fxLayoutAlign="center center">
         <strong>Liquidity</strong>
-        <span>{{ liquidity | async | number }} $</span>
+        <span>{{ liquidityUSD | async | number }} $</span>
       </div>
     </div>
 
@@ -99,65 +99,66 @@
 
     <ng-container *ngIf="isConnected$ | async; else connect">
 
-      <!--     <article class="pool-information" style="width: 100%; padding: 20px; height: 300px;">
+      <article class="pool-information" *ngIf="(roi | async) as roi">
+        {{roi |json}}
         <table>
           <tr>
             <th></th>
             <th>Pool</th>
-            <th>HODL Token</th>
-            <th>HODL Token2</th>
-          <th>HODL 50% - 50%</th>
-        </tr>
-        <tr>
-          <td><strong>Invested Amount</strong></td>
-          <td>{{ form.get('investment').value | number }} </td>
-          <td>{{ form.get('investment').value | number }}</td>
-          <td>{{ form.get('investment').value | number }}</td>
-          <td>{{ form.get('investment').value | number }}</td>
-        </tr>
-        <mat-divider></mat-divider>
-        <tr>
-          <td><strong>Price Appreciation</strong></td>
-          <td>{{ roiResult.get('priceAppreciationForPool') | number }}</td>
-          <td>{{ roiResult.get('priceAppreciationHODLTokenOne') | number }}</td>
-          <td>{{ roiResult.get('priceAppreciationHODLTokenTwo') | number }}</td>
-          <td>{{ roiResult.get('priceAppreciationHODL5050') | number }}</td>
-        </tr>
-        <mat-divider></mat-divider>
-        <tr>
-          <td><strong>Impermenant Loss</strong></td>
-          <td>{{ roiResult.get('impermenantLoss') | number }}</td>
-          <td>-</td>
-          <td>-</td>
-          <td>-</td>
-        </tr>
-        <mat-divider></mat-divider>
-        <tr>
-          <td><strong>Fees</strong></td>
-          <td>{{ roiResult.get('fees') | number }}</td>
-          <td>-</td>
-          <td>-</td>
-          <td>-</td>
-        </tr>
-        <mat-divider></mat-divider>
-        <tr>
-          <td><strong>Total</strong></td>
-          <td>{{ roiResult.get('totalPool') | number }}</td>
-          <td>{{ roiResult.get('totalHODLTokenOne') | number }}</td>
-          <td>{{ roiResult.get('totalHODLTokenTwo') | number }}</td>
-          <td>{{ roiResult.get('total5050') | number }}</td>
-        </tr>
-        <mat-divider></mat-divider>
-        <tr>
-          <td><strong>ROI</strong></td>
-          <td>{{ roiResult.get('roiPool') | number }}%</td>
-          <td>{{ roiResult.get('ROIHODLTokenOne') | number }}%</td>
-          <td>{{ roiResult.get('ROIHODLTokenTwo') | number }}%</td>
-          <td>{{ roiResult.get('roi5050') | number }}%</td>
-        </tr>
-        <mat-divider></mat-divider>
-      </table>
-    </article> -->
+            <th>HODL {{ (tokenOne$ | async).symbol }}</th>
+            <th>HODL {{ (tokenTwo$ | async).symbol }}</th>
+            <th>HODL 50% - 50%</th>
+          </tr>
+          <tr>
+            <td><strong>Invested Amount</strong></td>
+            <td>{{ form.get('investment').value | number }} </td>
+            <td>{{ form.get('investment').value | number }}</td>
+            <td>{{ form.get('investment').value | number }}</td>
+            <td>{{ form.get('investment').value | number }}</td>
+          </tr>
+          <mat-divider></mat-divider>
+          <tr>
+            <td><strong>Price Appreciation</strong></td>
+            <td>{{ roi.priceAppreciationForPool | number }}</td>
+            <td>{{ roi.priceAppreciationHODLTokenOne | number }}</td>
+            <td>{{ roi.priceAppreciationHODLTokenTwo | number }}</td>
+            <td>{{ roi.priceAppreciationHODL5050 | number }}</td>
+          </tr>
+          <mat-divider></mat-divider>
+          <tr>
+            <td><strong>Impermenant Loss</strong></td>
+            <td>{{ roi.impermenantLoss | number }}</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+          </tr>
+          <mat-divider></mat-divider>
+          <tr>
+            <td><strong>Fees</strong></td>
+            <td>{{ roi.fees | number }}</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+          </tr>
+          <mat-divider></mat-divider>
+          <tr>
+            <td><strong>Total</strong></td>
+            <td>{{ roi.totalPool | number }}</td>
+            <td>{{ roi.totalHODLTokenOne | number }}</td>
+            <td>{{ roi.totalHODLTokenTwo | number }}</td>
+            <td>{{ roi.total5050 | number }}</td>
+          </tr>
+          <mat-divider></mat-divider>
+          <tr>
+            <td><strong>ROI</strong></td>
+            <td>{{ roi.roiPool | number }}%</td>
+            <td>{{ roi.ROIHODLTokenOne | number }}%</td>
+            <td>{{ roi.ROIHODLTokenTwo | number }}%</td>
+            <td>{{ roi.roi5050 | number }}%</td>
+          </tr>
+          <mat-divider></mat-divider>
+        </table>
+      </article>
 
     </ng-container>
     <ng-template #connect>

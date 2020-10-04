@@ -60,10 +60,14 @@ export class PoolService {
     }
   }
 
-  fetchPool(tokenAddressOne: string, tokenAddressTwo?: string) {
+  fetchPool(tokenAddressOne: string, tokenAddressTwo?: string, secondTry?: boolean) {
     this.poolStore.reset();
     this.poolStore.setLoading(true);
-    const query = this.createQuery(tokenAddressOne, tokenAddressTwo);
+    let query;
+    if (secondTry) {
+      query = this.createQuery(tokenAddressTwo, tokenAddressOne);
+    }
+    query = this.createQuery(tokenAddressOne, tokenAddressTwo);
     const opts = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -86,15 +90,18 @@ export class PoolService {
             symbol: value.token1.symbol,
             priceUSD: value.reserveUSD / 2 / value.reserve1
           },
-          liquidity: Math.round(value.reserveUSD),
+          liquidityUSD: Math.round(value.reserveUSD),
           volumeUSD: Math.round(value.volumeUSD)
         });
-        console.log(this.poolStore.getValue());
         this.poolStore.setLoading(false);
       }).catch(error => {
-        this.snackbar.open('Could not find any pool!', 'Close', { duration: 3000 });
-        console.error(error);
-        this.poolStore.setLoading(false);
+        if (!secondTry) {
+          this.fetchPool(tokenAddressTwo, tokenAddressOne, true);
+        } else {
+          this.snackbar.open('Could not find any pool!', 'Close', { duration: 3000 });
+          console.error(error);
+          this.poolStore.setLoading(false);
+        }
       });
   }
 }

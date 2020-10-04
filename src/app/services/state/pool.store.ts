@@ -16,9 +16,11 @@ export interface PoolState {
   token0: Token;
   token1: Token;
   roi: Record<string, number>;
-  liquidity: number;
+  liquidityUSD: number;
   volumeUSD: number;
   isConnected: boolean;
+  reserveTokenOne: number;
+  reserveTokenTwo: number;
 }
 
 const initPoolState: PoolState = {
@@ -36,9 +38,11 @@ const initPoolState: PoolState = {
     priceUSD: 0
   },
   roi: {},
-  liquidity: 0,
+  liquidityUSD: 0,
   volumeUSD: 0,
-  isConnected: false
+  isConnected: false,
+  reserveTokenOne: 0,
+  reserveTokenTwo: 0
 };
 
 @Injectable({ providedIn: 'root' })
