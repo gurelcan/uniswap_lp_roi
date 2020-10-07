@@ -111,7 +111,7 @@ export class PoolService {
         });
         this.poolStore.setLoading(false);
       }).catch(error => {
-        if (false) {
+        if (!secondTry) {
           this.fetchPool(tokenAddressTwo, tokenAddressOne, true);
         } else {
           this.snackbar.open('Could not find any pool!', 'Close', { duration: 3000 });
