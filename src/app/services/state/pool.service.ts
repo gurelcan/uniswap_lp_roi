@@ -1,6 +1,8 @@
 // Angular
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
+
+// Others
 import { PoolStore } from './pool.store';
 
 @Injectable({ providedIn: 'root' })
@@ -28,11 +30,10 @@ export class PoolService {
             symbol
             decimals
             }
-            totalSupply
             reserveUSD
-            volumeUSD
             reserve0
             reserve1
+            volumeUSD
           }
         }`;
     } else {
@@ -52,9 +53,18 @@ export class PoolService {
             decimals
             }
             reserveUSD
-            volumeUSD
             reserve0
             reserve1
+            volumeUSD
+            totalSupply
+          }
+            pairDayDatas(orderBy: date,
+              orderDirection: desc, where: {pairAddress:
+                "${parsedTokenOne}"}, first: 1) {
+              id
+              dailyVolumeToken0
+              dailyVolumeToken1
+              dailyVolumeUSD
           }
         }`;
     }
@@ -74,7 +84,11 @@ export class PoolService {
       body: JSON.stringify({ query })
     };
     fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', opts)
-      .then(data => data.json()).then(value => {
+      .then(data => data.json()).catch(error => {
+        console.error(error);
+        this.poolStore.setLoading(false);
+      }).then(value => {
+        const volume = value.data.pairDayDatas[0].dailyVolumeUSD;
         value = value.data.pairs[0];
         this.poolStore.update({
           address: value.id,
@@ -91,11 +105,13 @@ export class PoolService {
             priceUSD: value.reserveUSD / 2 / value.reserve1
           },
           liquidityUSD: Math.round(value.reserveUSD),
-          volumeUSD: Math.round(value.volumeUSD)
+          volumeUSD: Math.round(volume),
+          reserveTokenOne: Math.round(value.reserve0),
+          reserveTokenTwo: Math.round(value.reserve1)
         });
         this.poolStore.setLoading(false);
       }).catch(error => {
-        if (!secondTry) {
+        if (false) {
           this.fetchPool(tokenAddressTwo, tokenAddressOne, true);
         } else {
           this.snackbar.open('Could not find any pool!', 'Close', { duration: 3000 });

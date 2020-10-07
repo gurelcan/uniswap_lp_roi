@@ -1,7 +1,7 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatAccordion } from '@angular/material/expansion';
-import { distinctUntilChanged, throttle, throttleTime } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { PoolQuery } from 'src/app/services/state/pool.query';
 import { PoolStore } from 'src/app/services/state/pool.store';
 
@@ -42,14 +42,15 @@ export class PoolInformationComponent {
     value ? setTimeout(() => this.accordion.openAll(), 100) : null;
   }
 
-  constructor(private query: PoolQuery, private poolStore: PoolStore) {
-    this.form.get('tokenOne').setValue(this.query.getValue().token0.priceUSD.toFixed(2));
-    this.form.get('tokenTwo').setValue(this.query.getValue().token1.priceUSD.toFixed(2));
+  constructor(private query: PoolQuery, private poolStore: PoolStore, private cdr: ChangeDetectorRef) {
+    this.form.get('tokenOne').setValue(Math.round(this.query.getValue().token0.priceUSD));
+    this.form.get('tokenTwo').setValue(Math.round(this.query.getValue().token1.priceUSD));
     this.form.get('volume').setValue(Math.round(this.query.getValue().volumeUSD));
     this.form.get('liquidity').setValue(Math.round(this.query.getValue().liquidityUSD));
-    this.form.valueChanges.pipe(distinctUntilChanged(), throttleTime(500)).subscribe(() => {
+    this.form.valueChanges.pipe(distinctUntilChanged(), debounceTime(500)).subscribe(() => {
       this.calculateROI();
     });
+    this.calculateROI();
   }
 
   formatLabel(value: number): string | number {
@@ -67,55 +68,53 @@ export class PoolInformationComponent {
   calculateROI() {
     const { investment, days, liquidity, tokenOne, tokenTwo, volume } = this.form.value;
 
-    const { liquidityUSD, volumeUSD, token0, token1, reserveTokenOne, reserveTokenTwo } = this.query.getValue();
+    const { liquidityUSD, volumeUSD, reserveTokenOne, reserveTokenTwo } = this.query.getValue();
 
-    const poolTokenOne = token0;
-    const poolTokenTwo = token1;
-    console.log(poolTokenTwo, poolTokenOne)
+    const poolTokenOne = liquidityUSD / 2 / reserveTokenOne;
+    const poolTokenTwo = liquidityUSD / 2 / reserveTokenTwo;
 
     try {
 
-      const tokenOneInvested = (investment / 2) / poolTokenOne.priceUSD;
-      const tokenTwoInvested = (investment / 2) / poolTokenTwo.priceUSD;
-      const CONSTANT = (tokenOneInvested + tokenOne.balance) * (tokenTwoInvested + tokenTwo.balance);
-      const tokenOnePriceInTokenTwo = reserveTokenOne / reserveTokenTwo;
+      /* Calculation variables for ROI */
+      const tokenOneInvested = (investment / 2) / poolTokenOne;
+      const tokenTwoInvested = (investment / 2) / poolTokenTwo;
+      const CONSTANT = (tokenOneInvested + tokenOne) * (tokenTwoInvested + tokenTwo);
+      const tokenOnePriceInTokenTwo = tokenOne / tokenTwo;
       const tokenOneLPAtExit = Math.sqrt(CONSTANT / tokenOnePriceInTokenTwo);
       const tokenTwoLPAtExit = Math.sqrt(CONSTANT * tokenOnePriceInTokenTwo);
-      const liquidityShareAtEntry = tokenOneInvested / (tokenOneInvested + tokenOne.balance);
+      const liquidityShareAtEntry = tokenOneInvested / (tokenOneInvested + tokenOne);
       const tokenOneRemoved = liquidityShareAtEntry * tokenOneLPAtExit;
-      const liquidityShareAtExit = tokenOneRemoved / (liquidity / 2 / reserveTokenOne);
+      const liquidityShareAtExit = tokenOneRemoved / (liquidity / 2 / tokenOne);
       const liquidityShareAverage = (liquidityShareAtExit + liquidityShareAtEntry) / 2;
       const tokenTwoRemoved = tokenTwoLPAtExit * liquidityShareAtEntry;
-      const volumePriceAppreciation = ((reserveTokenOne / poolTokenOne.priceUSD) +
-        (reserveTokenTwo / poolTokenTwo.priceUSD)) / 2;
+      const volumePriceAppreciation = ((tokenOne / poolTokenOne) + (tokenTwo / poolTokenTwo)) / 2;
       const volumeAfterAppreciation = volumeUSD * volumePriceAppreciation;
 
-      const liquidityAfterAppreciation = tokenOneLPAtExit * reserveTokenOne + tokenTwoLPAtExit * reserveTokenTwo;
+      /* Range calculations */
+      const liquidityAfterAppreciation = tokenOneLPAtExit * tokenOne + tokenTwoLPAtExit * tokenTwo;
       const liquidtyPriceAppreciation = liquidityAfterAppreciation / (investment + liquidityUSD);
       const tokenOnePriceAllowedRange = 10;
       const tokenTwoPriceAllowedRange = 10;
       const volumeChangeAllowedRange = 5;
       const liquidityChangeAllowedRange = 5;
 
-
-      this.form.get('tokenOne').setValidators(Validators.min(poolTokenOne.priceUSD / tokenOnePriceAllowedRange));
-      this.form.get('tokenOne').setValidators(Validators.max(poolTokenOne.priceUSD * tokenOnePriceAllowedRange));
-      this.form.get('tokenTwo').setValidators(Validators.min(poolTokenTwo.priceUSD * tokenTwoPriceAllowedRange));
-      this.form.get('tokenTwo').setValidators(Validators.max(poolTokenTwo.priceUSD * tokenTwoPriceAllowedRange));
-      this.sliderRange.vol.min = volumeAfterAppreciation / volumeChangeAllowedRange;
-      this.sliderRange.vol.max = volumeAfterAppreciation * volumeChangeAllowedRange;
-      this.sliderRange.liq.min = this.findMaxValue(liquidityAfterAppreciation / liquidityChangeAllowedRange,
-        liquidtyPriceAppreciation * investment);
-      this.sliderRange.liq.max = liquidityAfterAppreciation * liquidityChangeAllowedRange;
-
-
-      const priceAppreciationForPool = (reserveTokenOne[0] * tokenOneInvested + reserveTokenTwo * tokenTwoInvested) - investment;
-      const priceAppreciationHODLTokenOne = (investment * reserveTokenOne[0]) / token0.priceUSD - investment;
-      const priceAppreciationHODLTokenTwo = (investment * reserveTokenTwo[1]) / token1.priceUSD - investment;
-      const priceAppreciationHODL5050 = investment / 2 * reserveTokenOne[0] / token0.priceUSD
-        + investment / 2 * reserveTokenTwo[1] / token1.priceUSD - investment;
-      const impermenantLoss = tokenOneRemoved * reserveTokenOne[0] +
-        tokenTwoRemoved * reserveTokenTwo[1] - investment - priceAppreciationForPool;
+      this.form.get('tokenOne').setValidators(Validators.min(poolTokenOne / tokenOnePriceAllowedRange));
+      this.form.get('tokenOne').setValidators(Validators.max(poolTokenOne * tokenOnePriceAllowedRange));
+      this.form.get('tokenTwo').setValidators(Validators.min(poolTokenTwo / tokenTwoPriceAllowedRange));
+      this.form.get('tokenTwo').setValidators(Validators.max(poolTokenTwo * tokenTwoPriceAllowedRange));
+      this.sliderRange.vol.min = Math.round(Math.round(volumeAfterAppreciation) / volumeChangeAllowedRange);
+      this.sliderRange.vol.max = Math.round(Math.round(volumeAfterAppreciation) * volumeChangeAllowedRange);
+      this.sliderRange.liq.min = Math.round(this.findMaxValue(liquidityAfterAppreciation / liquidityChangeAllowedRange,
+        liquidtyPriceAppreciation * investment));
+      this.sliderRange.liq.max = Math.round(liquidityAfterAppreciation * liquidityChangeAllowedRange);
+        console.log(this.sliderRange)
+      /* Calculate Table */
+      const priceAppreciationForPool = (tokenOne * tokenOneInvested + tokenTwo * tokenTwoInvested) - investment;
+      const priceAppreciationHODLTokenOne = (investment * tokenOne) / poolTokenOne - investment;
+      const priceAppreciationHODLTokenTwo = (investment * tokenTwo) / poolTokenTwo - investment;
+      const priceAppreciationHODL5050 = investment / 2 * tokenOne / poolTokenOne
+        + investment / 2 * tokenTwo / poolTokenTwo - investment;
+      const impermenantLoss = tokenOneRemoved * tokenOne + tokenTwoRemoved * tokenTwo - investment - priceAppreciationForPool;
       const feesCollected = volume * days * liquidityShareAverage * 0.003;
       const totalPool = priceAppreciationForPool + impermenantLoss + feesCollected + investment;
       const totalHODLTokenOne = investment + priceAppreciationHODLTokenOne;
@@ -140,17 +139,8 @@ export class PoolInformationComponent {
           total5050: Math.round(total5050)
         }
       });
-
-      console.log(tokenOneInvested, tokenTwoInvested, CONSTANT, tokenOnePriceInTokenTwo, tokenOneLPAtExit, tokenTwoLPAtExit,
-        liquidityShareAtEntry, tokenOneRemoved, liquidityShareAtExit, liquidityShareAverage, tokenTwoRemoved, volumePriceAppreciation,
-        volumeAfterAppreciation, feesCollected);
-      /*       if (updateSliders) {
-              this.form.get('liquidity').setValue(liquidityAfterAppreciation.toFixed(2));
-              this.form.get('volume').setValue(volumeAfterAppreciation.toFixed(2));
-            } */
-
-
-
+      console.log(this.poolStore.getValue())
+      this.cdr.markForCheck();
     } catch (error) {
       console.error(error);
     }

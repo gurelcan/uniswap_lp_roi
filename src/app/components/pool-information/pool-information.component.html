@@ -54,25 +54,29 @@
           <mat-form-field appearance="outline">
             <mat-label>{{ token.symbol }} price in USD</mat-label>
             <input matInput type="number" [formControl]="form.get('tokenOne')" autocomplete="off">
+            <mat-error *ngIf="form.get('tokenOne').hasError('min')">ERROR</mat-error>
+            <mat-error *ngIf="form.get('tokenOne').hasError('max')">ERROR</mat-error>
           </mat-form-field>
         </ng-container>
         <ng-container *ngIf="tokenTwo$ | async as token">
           <mat-form-field appearance="outline">
             <mat-label>{{ token.symbol }} price in USD</mat-label>
             <input matInput type="number" [formControl]="form.get('tokenTwo')" autocomplete="off">
+            <mat-error *ngIf="form.get('tokenTwo').hasError('min')">ERROR</mat-error>
+            <mat-error *ngIf="form.get('tokenTwo').hasError('max')">ERROR</mat-error>
           </mat-form-field>
         </ng-container>
       </div>
 
-      <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000" min="1" max="9999999999" color="primary"
-        [formControl]="form.get('volume')">
+      <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000000" [min]="sliderRange.vol.min"
+        [max]="sliderRange.vol.min" color="primary" [formControl]="form.get('volume')">
       </mat-slider>
       <span>Volume: {{form.get('volume').value | number}}</span>
 
       <mat-divider></mat-divider>
 
-      <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000" min="1" max="9999999999" color="primary"
-        [formControl]="form.get('liquidity')">
+      <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000000" [min]="sliderRange.liq.min"
+        [max]="sliderRange.liq.min" color="primary" [formControl]="form.get('liquidity')">
       </mat-slider>
       <span>Liquidity:{{form.get('liquidity').value | number}}</span>
 
@@ -99,8 +103,7 @@
 
     <ng-container *ngIf="isConnected$ | async; else connect">
 
-      <article class="pool-information" *ngIf="(roi | async) as roi">
-        {{roi |json}}
+      <article *ngIf="(roi | async) as roi">
         <table>
           <tr>
             <th></th>
