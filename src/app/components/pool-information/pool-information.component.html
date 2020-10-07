@@ -49,34 +49,42 @@
     <h3>Choose final values during withdraw from pool</h3>
 
     <article fxLayoutAlign="start center" fxLayout="column" fxLayoutGap="15px">
-      <div fxLayout fxLayoutAlign="center start" fxLayoutGap="20px">
+      <div fxLayout fxLayoutAlign="center start" fxLayoutGap="30px">
         <ng-container *ngIf="tokenOne$ | async as token">
-          <mat-form-field appearance="outline">
-            <mat-label>{{ token.symbol }} price in USD</mat-label>
-            <input matInput type="number" [formControl]="form.get('tokenOne')" autocomplete="off">
-            <mat-error *ngIf="form.get('tokenOne').hasError('min')">ERROR</mat-error>
-            <mat-error *ngIf="form.get('tokenOne').hasError('max')">ERROR</mat-error>
-          </mat-form-field>
+          <div fxLayout="column" fxLayoutAlign="start center">
+            <mat-form-field appearance="outline">
+              <mat-label>{{ token.symbol }} price in USD</mat-label>
+              <input matInput type="number" [formControl]="form.get('tokenOne')" autocomplete="off">
+            </mat-form-field>
+            <mat-error *ngIf="form.get('tokenOne').value < inputRange.tokenOne.min">Price can't be below
+              {{ inputRange.tokenOne.min }}$</mat-error>
+            <mat-error *ngIf="form.get('tokenOne').value > inputRange.tokenOne.max">Price can't be above
+              {{ inputRange.tokenOne.max }}$</mat-error>
+          </div>
         </ng-container>
         <ng-container *ngIf="tokenTwo$ | async as token">
-          <mat-form-field appearance="outline">
-            <mat-label>{{ token.symbol }} price in USD</mat-label>
-            <input matInput type="number" [formControl]="form.get('tokenTwo')" autocomplete="off">
-            <mat-error *ngIf="form.get('tokenTwo').hasError('min')">ERROR</mat-error>
-            <mat-error *ngIf="form.get('tokenTwo').hasError('max')">ERROR</mat-error>
-          </mat-form-field>
+          <div fxLayout="column" fxLayoutAlign="start center">
+            <mat-form-field appearance="outline">
+              <mat-label>{{ token.symbol }} price in USD</mat-label>
+              <input matInput type="number" [formControl]="form.get('tokenTwo')" autocomplete="off">
+            </mat-form-field>
+            <mat-error *ngIf="form.get('tokenTwo').value < inputRange.tokenTwo.min">Price can't be below
+              {{ inputRange.tokenTwo.min }}$</mat-error>
+            <mat-error *ngIf="form.get('tokenTwo').value > inputRange.tokenTwo.max">Price can't be above
+              {{ inputRange.tokenTwo.max }}$</mat-error>
+          </div>
         </ng-container>
       </div>
 
-      <mat-slider thumbLabel [displayWith]="formatLabel" [min]="sliderRange.vol.min"
-        [max]="sliderRange.vol.max" color="primary" [formControl]="form.get('volume')">
+      <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputRange.vol.min" [max]="inputRange.vol.max"
+        color="primary" [formControl]="form.get('volume')">
       </mat-slider>
       <span>Volume: {{form.get('volume').value | number}}</span>
 
       <mat-divider></mat-divider>
 
-      <mat-slider thumbLabel [displayWith]="formatLabel" [min]="sliderRange.liq.min"
-        [max]="sliderRange.liq.max" color="primary" [formControl]="form.get('liquidity')">
+      <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputRange.liq.min" [max]="inputRange.liq.max"
+        color="primary" [formControl]="form.get('liquidity')">
       </mat-slider>
       <span>Liquidity: {{form.get('liquidity').value | number}}</span>
 

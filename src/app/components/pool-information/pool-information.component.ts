@@ -34,7 +34,10 @@ export class PoolInformationComponent {
 
   isConnected$ = this.query.select('isConnected');
 
-  sliderRange = { vol: { min: 0, max: 99999999 }, liq: { min: 0, max: 99999999 } };
+  inputRange = {
+    tokenOne: { min: 0, max: 99999999 }, tokenTwo: { min: 0, max: 99999999 },
+    vol: { min: 0, max: 99999999 }, liq: { min: 0, max: 99999999 }
+  };
 
   roi = this.query.select('roi');
 
@@ -98,16 +101,16 @@ export class PoolInformationComponent {
       const volumeChangeAllowedRange = 5;
       const liquidityChangeAllowedRange = 5;
 
-      this.form.get('tokenOne').setValidators(Validators.min(poolTokenOne / tokenOnePriceAllowedRange));
-      this.form.get('tokenOne').setValidators(Validators.max(poolTokenOne * tokenOnePriceAllowedRange));
-      this.form.get('tokenTwo').setValidators(Validators.min(poolTokenTwo / tokenTwoPriceAllowedRange));
-      this.form.get('tokenTwo').setValidators(Validators.max(poolTokenTwo * tokenTwoPriceAllowedRange));
-      this.sliderRange.vol.min = Math.round(Math.round(volumeAfterAppreciation) / volumeChangeAllowedRange);
-      this.sliderRange.vol.max = Math.round(Math.round(volumeAfterAppreciation) * volumeChangeAllowedRange);
-      this.sliderRange.liq.min = this.findMaxValue(liquidityAfterAppreciation / liquidityChangeAllowedRange,
-        liquidtyPriceAppreciation * investment);
-      this.sliderRange.liq.max = liquidityAfterAppreciation * liquidityChangeAllowedRange;
-      console.log(this.sliderRange)
+      this.inputRange.tokenOne.min = Math.round(poolTokenOne / tokenOnePriceAllowedRange);
+      this.inputRange.tokenOne.max = Math.round(poolTokenOne * tokenOnePriceAllowedRange);
+      this.inputRange.tokenTwo.min = Math.round(poolTokenTwo / tokenTwoPriceAllowedRange);
+      this.inputRange.tokenTwo.max = Math.round(poolTokenTwo * tokenTwoPriceAllowedRange);
+      this.inputRange.vol.min = Math.round(Math.round(volumeAfterAppreciation) / volumeChangeAllowedRange);
+      this.inputRange.vol.max = Math.round(Math.round(volumeAfterAppreciation) * volumeChangeAllowedRange);
+      this.inputRange.liq.min = Math.round(this.findMaxValue(liquidityAfterAppreciation / liquidityChangeAllowedRange,
+        liquidtyPriceAppreciation * investment));
+      this.inputRange.liq.max = Math.round(liquidityAfterAppreciation * liquidityChangeAllowedRange);
+      console.log(this.inputRange, this.form.get('tokenOne'))
       /* Calculate Table */
       const priceAppreciationForPool = (tokenOne * tokenOneInvested + tokenTwo * tokenTwoInvested) - investment;
       const priceAppreciationHODLTokenOne = (investment * tokenOne) / poolTokenOne - investment;
@@ -139,7 +142,6 @@ export class PoolInformationComponent {
           total5050: Math.round(total5050)
         }
       });
-      console.log(this.poolStore.getValue())
       this.cdr.markForCheck();
     } catch (error) {
       console.error(error);
