@@ -78,11 +78,11 @@ export class PoolInformationComponent {
       /* Calculation variables for ROI */
       const tokenOneInvested = (investment / 2) / poolTokenOne;
       const tokenTwoInvested = (investment / 2) / poolTokenTwo;
-      const CONSTANT = (tokenOneInvested + tokenOne) * (tokenTwoInvested + tokenTwo);
+      const CONSTANT = (tokenOneInvested + reserveTokenOne) * (tokenTwoInvested + reserveTokenTwo);
       const tokenOnePriceInTokenTwo = tokenOne / tokenTwo;
       const tokenOneLPAtExit = Math.sqrt(CONSTANT / tokenOnePriceInTokenTwo);
       const tokenTwoLPAtExit = Math.sqrt(CONSTANT * tokenOnePriceInTokenTwo);
-      const liquidityShareAtEntry = tokenOneInvested / (tokenOneInvested + tokenOne);
+      const liquidityShareAtEntry = tokenOneInvested / (tokenOneInvested + reserveTokenOne);
       const tokenOneRemoved = liquidityShareAtEntry * tokenOneLPAtExit;
       const liquidityShareAtExit = tokenOneRemoved / (liquidity / 2 / tokenOne);
       const liquidityShareAverage = (liquidityShareAtExit + liquidityShareAtEntry) / 2;
@@ -104,10 +104,10 @@ export class PoolInformationComponent {
       this.form.get('tokenTwo').setValidators(Validators.max(poolTokenTwo * tokenTwoPriceAllowedRange));
       this.sliderRange.vol.min = Math.round(Math.round(volumeAfterAppreciation) / volumeChangeAllowedRange);
       this.sliderRange.vol.max = Math.round(Math.round(volumeAfterAppreciation) * volumeChangeAllowedRange);
-      this.sliderRange.liq.min = Math.round(this.findMaxValue(liquidityAfterAppreciation / liquidityChangeAllowedRange,
-        liquidtyPriceAppreciation * investment));
-      this.sliderRange.liq.max = Math.round(liquidityAfterAppreciation * liquidityChangeAllowedRange);
-        console.log(this.sliderRange)
+      this.sliderRange.liq.min = this.findMaxValue(liquidityAfterAppreciation / liquidityChangeAllowedRange,
+        liquidtyPriceAppreciation * investment);
+      this.sliderRange.liq.max = liquidityAfterAppreciation * liquidityChangeAllowedRange;
+      console.log(this.sliderRange)
       /* Calculate Table */
       const priceAppreciationForPool = (tokenOne * tokenOneInvested + tokenTwo * tokenTwoInvested) - investment;
       const priceAppreciationHODLTokenOne = (investment * tokenOne) / poolTokenOne - investment;

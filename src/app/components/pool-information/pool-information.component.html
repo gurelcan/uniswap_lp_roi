@@ -1,5 +1,5 @@
 <h3>👉 <a mat-button [href]="'https://uniswap.info/pair/' + (poolAddress | async)" target="_blank"
-    class="primary-color">{{ (tokenOne$ | async).symbol }} - {{ (tokenTwo$ | async).symbol }} Uniswap v2 Pool </a></h3>
+    class="primary-color">{{ (tokenOne$ | async).symbol }} - {{ (tokenTwo$ | async).symbol }} Uniswap V2 Pool </a></h3>
 
 <mat-accordion multi>
 
@@ -27,11 +27,11 @@
       </div>
       <div fxLayout="column" fxLayoutAlign="center center">
         <strong>Volume</strong>
-        <span>{{ volume | async | number }} $</span>
+        <span>{{ volume | async | number }}$</span>
       </div>
       <div fxLayout="column" fxLayoutAlign="center center">
         <strong>Liquidity</strong>
-        <span>{{ liquidityUSD | async | number }} $</span>
+        <span>{{ liquidityUSD | async | number }}$</span>
       </div>
     </div>
 
@@ -68,17 +68,17 @@
         </ng-container>
       </div>
 
-      <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000000" [min]="sliderRange.vol.min"
-        [max]="sliderRange.vol.min" color="primary" [formControl]="form.get('volume')">
+      <mat-slider thumbLabel [displayWith]="formatLabel" [min]="sliderRange.vol.min"
+        [max]="sliderRange.vol.max" color="primary" [formControl]="form.get('volume')">
       </mat-slider>
       <span>Volume: {{form.get('volume').value | number}}</span>
 
       <mat-divider></mat-divider>
 
-      <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000000" [min]="sliderRange.liq.min"
-        [max]="sliderRange.liq.min" color="primary" [formControl]="form.get('liquidity')">
+      <mat-slider thumbLabel [displayWith]="formatLabel" [min]="sliderRange.liq.min"
+        [max]="sliderRange.liq.max" color="primary" [formControl]="form.get('liquidity')">
       </mat-slider>
-      <span>Liquidity:{{form.get('liquidity').value | number}}</span>
+      <span>Liquidity: {{form.get('liquidity').value | number}}</span>
 
       <div fxLayout fxLayoutAlign="center start" fxLayoutGap="20px">
         <mat-form-field appearance="outline">

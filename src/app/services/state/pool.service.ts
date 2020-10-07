@@ -88,7 +88,8 @@ export class PoolService {
         console.error(error);
         this.poolStore.setLoading(false);
       }).then(value => {
-        const volume = value.data.pairDayDatas[0].dailyVolumeUSD;
+        console.log(value)
+        const volume = value.data.pairDayDatas[0]?.dailyVolumeUSD;
         value = value.data.pairs[0];
         this.poolStore.update({
           address: value.id,
