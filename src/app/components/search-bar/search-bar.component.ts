@@ -23,14 +23,14 @@ export class SearchBarComponent {
 
   async fetchPool() {
     if (this.searchForm.value.searchBySymbols) {
-      this.poolService.fetchPool(this.searchForm.value.tokenOne?.address
+      this.poolService.fetchPoolWithTokenAddresses(this.searchForm.value.tokenOne?.address
         ? this.searchForm.value.tokenOne.address
         : this.searchForm.value.tokenOne.trim(),
         this.searchForm.value.tokenTwo?.address
           ? this.searchForm.value.tokenTwo.address
           : this.searchForm.value.tokenTwo.trim());
     } else {
-      this.poolService.fetchPool(this.searchForm.value.poolAddress);
+      this.poolService.fetchPoolWithAddress(this.searchForm.value.poolAddress);
 
     }
   }

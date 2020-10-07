@@ -118,14 +118,6 @@ export const tokenDictionary: Record<string, any[]> = {
       "img": `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359/logo.png`
     },
     {
-      "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "symbol": "ETH",
-      "decimal": 18,
-      "chainId": 1,
-      "type": "default",
-      "img": 'assets/icons/ether.png'
-    },
-    {
       "address": "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2",
       "symbol": "MKR",
       "decimal": 18,

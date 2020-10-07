@@ -110,7 +110,7 @@ export class PoolInformationComponent {
       this.inputRange.liq.min = Math.round(this.findMaxValue(liquidityAfterAppreciation / liquidityChangeAllowedRange,
         liquidtyPriceAppreciation * investment));
       this.inputRange.liq.max = Math.round(liquidityAfterAppreciation * liquidityChangeAllowedRange);
-      console.log(this.inputRange, this.form.get('tokenOne'))
+
       /* Calculate Table */
       const priceAppreciationForPool = (tokenOne * tokenOneInvested + tokenTwo * tokenTwoInvested) - investment;
       const priceAppreciationHODLTokenOne = (investment * tokenOne) / poolTokenOne - investment;
