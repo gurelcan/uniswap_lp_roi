@@ -1,8 +1,7 @@
 <h3 *ngIf="!!(showPoolInfo |async)">👉 <span class="pink"><a mat-button
       [href]="'https://uniswap.info/pair/' + (poolAddress | async)" target="_blank"
       class="primary-color">{{ (tokenOne$ | async).symbol }} - {{ (tokenTwo$ | async).symbol }} Uniswap V2
-    </a>
-    Pool</span>
+      Pool</a></span>
 </h3>
 
 <mat-accordion multi>
@@ -140,7 +139,6 @@
               <td>{{ form.get('investment').value | number }}</td>
               <td>{{ form.get('investment').value | number }}</td>
             </tr>
-            <mat-divider></mat-divider>
             <tr>
               <td><strong>Price Appreciation</strong></td>
               <td>{{ roi.priceAppreciationForPool | number }}</td>
@@ -148,7 +146,6 @@
               <td>{{ roi.priceAppreciationHODLTokenTwo | number }}</td>
               <td>{{ roi.priceAppreciationHODL5050 | number }}</td>
             </tr>
-            <mat-divider></mat-divider>
             <tr>
               <td><strong>Impermenant Loss</strong></td>
               <td>{{ roi.impermenantLoss | number }}</td>
@@ -156,7 +153,6 @@
               <td>-</td>
               <td>-</td>
             </tr>
-            <mat-divider></mat-divider>
             <tr>
               <td><strong>Fees</strong></td>
               <td>{{ roi.fees | number }}</td>
@@ -164,7 +160,6 @@
               <td>-</td>
               <td>-</td>
             </tr>
-            <mat-divider></mat-divider>
             <tr>
               <td><strong>Total</strong></td>
               <td>{{ roi.totalPool | number }}</td>
@@ -172,7 +167,6 @@
               <td>{{ roi.totalHODLTokenTwo | number }}</td>
               <td>{{ roi.total5050 | number }}</td>
             </tr>
-            <mat-divider></mat-divider>
             <tr>
               <td><strong>ROI</strong></td>
               <td>{{ roi.roiPool | number }}%</td>
@@ -180,7 +174,6 @@
               <td>{{ roi.ROIHODLTokenTwo | number }}%</td>
               <td>{{ roi.roi5050 | number }}%</td>
             </tr>
-            <mat-divider></mat-divider>
           </table>
         </article>
       </ng-container>

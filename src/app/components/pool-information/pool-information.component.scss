@@ -14,4 +14,12 @@ table {
   th {
     text-align: end;
   }
+
+  tr:nth-child(even) {
+    background: #eee;
+  }
+}
+
+#cdk-describedby-message-container {
+  color: black;
 }

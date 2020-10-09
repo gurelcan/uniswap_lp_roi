@@ -1,10 +1,14 @@
-import { ChangeDetectorRef, Component, Input, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { MatAccordion } from '@angular/material/expansion';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { distinctUntilChanged } from 'rxjs/operators';
 import { PoolQuery } from 'src/app/services/state/pool.query';
 import { PoolStore } from 'src/app/services/state/pool.store';
 import { Web3Service } from 'src/app/services/web3.service';
+
+
+// Lodash
+import { isEqual } from 'lodash';
 
 @Component({
   selector: 'app-pool-information',
@@ -38,11 +42,13 @@ export class PoolInformationComponent {
   isConnected = this.web3.isConnected;
 
   inputRange = {
-    tokenOne: { min: 0, max: 99999999 }, tokenTwo: { min: 0, max: 99999999 },
-    vol: { min: 0, max: 99999999 }, liq: { min: 0, max: 99999999 }
+    tokenOne: { min: 0, max: 99999999 }, tokenTwo: { min: 0, max: 999999999 },
+    vol: { min: 0, max: 99999999 }, liq: { min: 0, max: 999999999 }
   };
 
   roi = this.query.select('roi');
+
+  private shouldUpdateSliders = true;
 
   constructor(
     private query: PoolQuery,
@@ -55,19 +61,20 @@ export class PoolInformationComponent {
         this.form.get('tokenTwo').setValue(Math.round(this.query.getValue().token1.priceUSD));
         this.form.get('volume').setValue(Math.round(this.query.getValue().volumeUSD));
         this.form.get('liquidity').setValue(Math.round(this.query.getValue().liquidityUSD));
-        this.form.valueChanges.pipe(distinctUntilChanged(), debounceTime(500)).subscribe(() => {
-          this.calculateROI();
-        });
-      }
-    });
-    this.showPoolInfo.subscribe(value => {
-      if (value.length) {
         this.accordion.openAll();
+        this.form.valueChanges.pipe(distinctUntilChanged((prev, cur) => {
+          this.shouldUpdateSliders = prev.liquidity === cur.liquidity && prev.volume === cur.volume;
+          return isEqual(prev, cur);
+        })).subscribe(_ => this.calculateROI(this.shouldUpdateSliders));
       }
     });
   }
 
   formatLabel(value: number): string | number {
+    if (value >= 1000000000) {
+      return Math.round(value / 1000) + 'B';
+    }
+
     if (value >= 1000000) {
       return Math.round(value / 1000000) + 'M';
     }
@@ -79,7 +86,7 @@ export class PoolInformationComponent {
     return value;
   }
 
-  calculateROI() {
+  calculateROI(updateSliders: boolean) {
     const { investment, days, liquidity, tokenOne, tokenTwo, volume } = this.form.value;
 
     const { liquidityUSD, volumeUSD, reserveTokenOne, reserveTokenTwo } = this.query.getValue();
@@ -105,7 +112,6 @@ export class PoolInformationComponent {
       const volumeAfterAppreciation = volumeUSD * volumePriceAppreciation;
       const liquidityAfterAppreciation = tokenOneLPAtExit * tokenOne + tokenTwoLPAtExit * tokenTwo;
 
-      console.log(liquidityAfterAppreciation)
       /* Range calculations */
       const liquidtyPriceAppreciation = liquidityAfterAppreciation / (investment + liquidityUSD);
       const tokenOnePriceAllowedRange = 10;
@@ -154,6 +160,11 @@ export class PoolInformationComponent {
           total5050: Math.round(total5050)
         }
       });
+
+      if (updateSliders) {
+        this.form.get('liquidity').setValue(liquidityAfterAppreciation.toFixed(2));
+        this.form.get('volume').setValue(volumeAfterAppreciation.toFixed(2));
+      }
       this.cdr.markForCheck();
     } catch (error) {
       console.error(error);

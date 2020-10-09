@@ -3,9 +3,9 @@
     {{ searchForm.get('searchBySymbols').value ? 'Search by Tokens' : 'Search by Pool Address' }}
   </mat-slide-toggle>
   <div *ngIf="searchForm.get('searchBySymbols').value; else poolAddress">
-    <app-token [control]="searchForm.get('tokenOne')"></app-token>
+    <app-token [control]="searchForm.get('tokenOne')" class="pool-address"></app-token>
     &
-    <app-token [control]="searchForm.get('tokenTwo')"></app-token>
+    <app-token [control]="searchForm.get('tokenTwo')" class="pool-address"></app-token>
   </div>
   <ng-template #poolAddress>
     <mat-form-field appearance="outline" class="pool-address">

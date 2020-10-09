@@ -125,40 +125,15 @@ export class PoolService {
       .then(data => data.json()).catch(error => {
         console.error(error);
         this.poolStore.setLoading(false);
-      }).then(async value => {
-        value = value.data.pairs[0];
-        let volume = 0;
-        if (value?.id) {
-          const dailyQuery = `query {
-            pairDayDatas(orderBy: date, orderDirection: desc, where: {pairAddress: "${value.id}"} first: 1) {
-            id
-            dailyVolumeUSD
-            }
-        }`;
-          const fetchedData = await this.fetchPairData(dailyQuery);
-          const parsedPoolData = await fetchedData.json();
-          volume = parsedPoolData.data.pairDayDatas[0].dailyVolumeUSD;
+      }).then(value => {
+        if (value.data.pairs.length > 1) {
+          value = value.data.pairs.sort((a, b) => parseInt(b.volumeUSD, 10) - parseInt(a.volumeUSD, 10))[0];
+        } else {
+          value = value.data.pairs[0];
         }
-        this.poolStore.update({
-          address: value.id,
-          token0: {
-            decimal: value.token0.decimals,
-            address: value.token0.id,
-            symbol: value.token0.symbol,
-            priceUSD: value.reserveUSD / 2 / value.reserve0
-          },
-          token1: {
-            decimal: value.token1.decimals,
-            address: value.token1.id,
-            symbol: value.token1.symbol,
-            priceUSD: value.reserveUSD / 2 / value.reserve1
-          },
-          liquidityUSD: Math.round(value.reserveUSD),
-          volumeUSD: Math.round(volume),
-          reserveTokenOne: Math.round(value.reserve0),
-          reserveTokenTwo: Math.round(value.reserve1)
-        });
-        this.poolStore.setLoading(false);
+        if (value.id) {
+          this.fetchPoolWithAddress(value.id);
+        }
       }).catch(error => {
         if (!secondTry) {
           this.fetchPoolWithTokenAddresses(tokenTwoAddress, tokenOneAddress, true);
@@ -168,14 +143,5 @@ export class PoolService {
           this.poolStore.setLoading(false);
         }
       });
-  }
-
-  fetchPairData(dailyQuery: string) {
-    const opts = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ dailyQuery })
-    };
-    return fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', opts);
   }
 }
