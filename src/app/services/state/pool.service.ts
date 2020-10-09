@@ -83,6 +83,7 @@ export class PoolService {
         console.error(error);
         this.poolStore.setLoading(false);
       }).then(value => {
+        console.log(value)
         const volume = value.data?.pairDayDatas[0].dailyVolumeUSD;
         value = value.data.pairs[0];
         this.poolStore.update({
@@ -129,19 +130,13 @@ export class PoolService {
         value = value.data.pairs[0];
         let volume = 0;
         if (value?.id) {
-          console.log(value.id)
-          const dailyQuery = `query { pairDayDatas(orderBy: date,
-            orderDirection: desc, where: {pairAddress:
-              "${value.id.toLowerCase().trim()}"}, first: 1) {
+          const dailyQuery = `query {
+            pairDayDatas(orderBy: date, orderDirection: desc, where: {pairAddress: "${value.id}"} first: 1) {
             id
             dailyVolumeUSD
-              }
+            }
         }`;
-          const fetchedData = await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ dailyQuery })
-          });
+          const fetchedData = await this.fetchPairData(dailyQuery);
           const parsedPoolData = await fetchedData.json();
           console.log(parsedPoolData.data.pairDayDatas[0].dailyVolumeUSD);
           volume = parsedPoolData.data.pairDayDatas[0].dailyVolumeUSD;
@@ -175,5 +170,14 @@ export class PoolService {
           this.poolStore.setLoading(false);
         }
       });
+  }
+
+  fetchPairData(dailyQuery: string) {
+    const opts = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dailyQuery })
+    };
+    return fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', opts);
   }
 }

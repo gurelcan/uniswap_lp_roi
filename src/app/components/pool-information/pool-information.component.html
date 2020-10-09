@@ -46,7 +46,7 @@
       </mat-panel-title>
     </mat-expansion-panel-header>
 
-    <h3>Choose final values during withdraw from pool</h3>
+    <h3>Choose final values during withdrawal from pool</h3>
 
     <article fxLayoutAlign="start center" fxLayout="column" fxLayoutGap="15px">
       <div fxLayout fxLayoutAlign="center start" fxLayoutGap="30px">
@@ -76,17 +76,19 @@
         </ng-container>
       </div>
 
-      <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputRange.vol.min" [max]="inputRange.vol.max"
-        color="primary" [formControl]="form.get('volume')">
-      </mat-slider>
-      <span>Volume: {{form.get('volume').value | number}}</span>
+      <div fxLayout fxLayoutAlign="center center" fxLayoutGap="20px">
 
-      <mat-divider></mat-divider>
+        <span>Volume: </span>
+        <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputRange.vol.min" [max]="inputRange.vol.max"
+          color="primary" [formControl]="form.get('volume')">
+        </mat-slider>
 
-      <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputRange.liq.min" [max]="inputRange.liq.max"
-        color="primary" [formControl]="form.get('liquidity')">
-      </mat-slider>
-      <span>Liquidity: {{form.get('liquidity').value | number}}</span>
+        <span>Liquidity: </span>
+        <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputRange.liq.min" [max]="inputRange.liq.max"
+          color="primary" [formControl]="form.get('liquidity')">
+        </mat-slider>
+
+      </div>
 
       <div fxLayout fxLayoutAlign="center start" fxLayoutGap="20px">
         <mat-form-field appearance="outline">

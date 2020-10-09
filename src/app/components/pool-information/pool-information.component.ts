@@ -92,9 +92,10 @@ export class PoolInformationComponent {
       const tokenTwoRemoved = tokenTwoLPAtExit * liquidityShareAtEntry;
       const volumePriceAppreciation = ((tokenOne / poolTokenOne) + (tokenTwo / poolTokenTwo)) / 2;
       const volumeAfterAppreciation = volumeUSD * volumePriceAppreciation;
-
-      /* Range calculations */
       const liquidityAfterAppreciation = tokenOneLPAtExit * tokenOne + tokenTwoLPAtExit * tokenTwo;
+      
+      console.log(liquidityAfterAppreciation)
+      /* Range calculations */
       const liquidtyPriceAppreciation = liquidityAfterAppreciation / (investment + liquidityUSD);
       const tokenOnePriceAllowedRange = 10;
       const tokenTwoPriceAllowedRange = 10;
