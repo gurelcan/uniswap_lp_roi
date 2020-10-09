@@ -1,0 +1,188 @@
+<h3 *ngIf="!!(showPoolInfo |async)">👉 <span class="pink"><a mat-button
+      [href]="'https://uniswap.info/pair/' + (poolAddress | async)" target="_blank"
+      class="primary-color">{{ (tokenOne$ | async).symbol }} - {{ (tokenTwo$ | async).symbol }} Uniswap V2
+      Pool</a></span>
+</h3>
+
+<mat-accordion multi>
+
+  <!-- Pool Information -->
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Search Results
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <ng-container *ngIf="!!(showPoolInfo |async)">
+
+      <div fxLayout fxLayoutAlign="space-evenly start" fxLayoutGap="20px">
+        <div fxLayout="column" fxLayoutAlign="center center">
+          <ng-container *ngIf="tokenOne$ | async as token">
+            <strong>{{ token.symbol || 'No symbol provided' }}</strong>
+            <span>{{ token.priceUSD | number }}$</span>
+          </ng-container>
+        </div>
+        <div fxLayout="column" fxLayoutAlign="center center">
+          <ng-container *ngIf="tokenTwo$ | async as token">
+            <strong>{{ token.symbol || 'No symbol provided' }}</strong>
+            <span>{{ token.priceUSD | number }}$</span>
+          </ng-container>
+        </div>
+        <div fxLayout="column" fxLayoutAlign="center center">
+          <strong>Volume</strong>
+          <span>{{ volume | async | number }}$</span>
+        </div>
+        <div fxLayout="column" fxLayoutAlign="center center">
+          <strong>Liquidity</strong>
+          <span>{{ liquidityUSD | async | number }}$</span>
+        </div>
+      </div>
+    </ng-container>
+  </mat-expansion-panel>
+
+  <!-- Inputs -->
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        User Specification
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <ng-container *ngIf="!!(showPoolInfo |async)">
+
+      <h3>Choose final values during withdrawal from <span class="pink">pool</span></h3>
+
+      <article fxLayoutAlign="start center" fxLayout="column" fxLayoutGap="15px">
+        <div fxLayout fxLayoutAlign="center start" fxLayoutGap="30px">
+          <ng-container *ngIf="tokenOne$ | async as token">
+            <div fxLayout="column" fxLayoutAlign="start center">
+              <mat-form-field appearance="outline">
+                <mat-label>{{ token.symbol }} price in USD</mat-label>
+                <input matInput type="number" [formControl]="form.get('tokenOne')" autocomplete="off">
+              </mat-form-field>
+              <mat-error *ngIf="form.get('tokenOne').value < inputRange.tokenOne.min">Price can't be below
+                {{ inputRange.tokenOne.min }}$</mat-error>
+              <mat-error *ngIf="form.get('tokenOne').value > inputRange.tokenOne.max">Price can't be above
+                {{ inputRange.tokenOne.max }}$</mat-error>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="tokenTwo$ | async as token">
+            <div fxLayout="column" fxLayoutAlign="start center">
+              <mat-form-field appearance="outline">
+                <mat-label>{{ token.symbol }} price in USD</mat-label>
+                <input matInput type="number" [formControl]="form.get('tokenTwo')" autocomplete="off">
+              </mat-form-field>
+              <mat-error *ngIf="form.get('tokenTwo').value < inputRange.tokenTwo.min">Price can't be below
+                {{ inputRange.tokenTwo.min }}$</mat-error>
+              <mat-error *ngIf="form.get('tokenTwo').value > inputRange.tokenTwo.max">Price can't be above
+                {{ inputRange.tokenTwo.max }}$</mat-error>
+            </div>
+          </ng-container>
+        </div>
+
+        <div fxLayout fxLayoutAlign="center center" fxLayoutGap="20px">
+
+          <span [matTooltip]="'Volume: ' + form.get('volume').value">Volume: </span>
+          <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputRange.vol.min" [max]="inputRange.vol.max"
+            color="primary" [formControl]="form.get('volume')" [matTooltip]="'Volume: ' + form.get('volume').value">
+          </mat-slider>
+
+          <span [matTooltip]="'Liquidity: ' + form.get('liquidity').value">Liquidity: </span>
+          <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputRange.liq.min" [max]="inputRange.liq.max"
+            color="primary" [formControl]="form.get('liquidity')"
+            [matTooltip]="'Liquidity: ' + form.get('liquidity').value">
+          </mat-slider>
+
+        </div>
+
+        <div fxLayout fxLayoutAlign="center start" fxLayoutGap="20px">
+          <mat-form-field appearance="outline">
+            <mat-label>Investment in USD</mat-label>
+            <input matInput type="number" [formControl]="form.get('investment')" autocomplete="off">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Days in pool</mat-label>
+            <input matInput type="number" [formControl]="form.get('days')" autocomplete="off" min="1" max="365">
+          </mat-form-field>
+        </div>
+      </article>
+    </ng-container>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        ROI Table (Pool vs HODL)
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <ng-container *ngIf="isConnected.asObservable() | async; else connect">
+
+      <ng-container *ngIf="!!(showPoolInfo |async)">
+        <article *ngIf="(roi | async) as roi">
+          <table>
+            <tr>
+              <th></th>
+              <th>Pool</th>
+              <th>HODL {{ (tokenOne$ | async).symbol }}</th>
+              <th>HODL {{ (tokenTwo$ | async).symbol }}</th>
+              <th>HODL 50% - 50%</th>
+            </tr>
+            <tr>
+              <td><strong>Invested Amount</strong></td>
+              <td>{{ form.get('investment').value | number }} </td>
+              <td>{{ form.get('investment').value | number }}</td>
+              <td>{{ form.get('investment').value | number }}</td>
+              <td>{{ form.get('investment').value | number }}</td>
+            </tr>
+            <tr>
+              <td><strong>Price Appreciation</strong></td>
+              <td>{{ roi.priceAppreciationForPool | number }}</td>
+              <td>{{ roi.priceAppreciationHODLTokenOne | number }}</td>
+              <td>{{ roi.priceAppreciationHODLTokenTwo | number }}</td>
+              <td>{{ roi.priceAppreciationHODL5050 | number }}</td>
+            </tr>
+            <tr>
+              <td><strong>Impermenant Loss</strong></td>
+              <td>{{ roi.impermenantLoss | number }}</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr>
+              <td><strong>Fees</strong></td>
+              <td>{{ roi.fees | number }}</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr>
+              <td><strong>Total</strong></td>
+              <td>{{ roi.totalPool | number }}</td>
+              <td>{{ roi.totalHODLTokenOne | number }}</td>
+              <td>{{ roi.totalHODLTokenTwo | number }}</td>
+              <td>{{ roi.total5050 | number }}</td>
+            </tr>
+            <tr>
+              <td><strong>ROI</strong></td>
+              <td>{{ roi.roiPool | number }}%</td>
+              <td>{{ roi.ROIHODLTokenOne | number }}%</td>
+              <td>{{ roi.ROIHODLTokenTwo | number }}%</td>
+              <td>{{ roi.roi5050 | number }}%</td>
+            </tr>
+          </table>
+        </article>
+      </ng-container>
+    </ng-container>
+    <ng-template #connect>
+      <h3>Connect to <span class="pink">Meta Mask</span> to see your results</h3>
+      <div fxLayout fxLayoutAlign="center start">
+        <app-connect-button></app-connect-button>
+      </div>
+    </ng-template>
+  </mat-expansion-panel>
+</mat-accordion>

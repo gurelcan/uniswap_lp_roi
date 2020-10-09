@@ -1,0 +1,13 @@
+<mat-form-field appearance="outline">
+  <mat-label>{{ label }}</mat-label>
+  <input matInput [matAutocomplete]="auto" [formControl]="control" autocomplete="off" type="text">
+  <mat-hint>Choose a token from dropdown or put a token address</mat-hint>
+</mat-form-field>
+<mat-autocomplete #auto="matAutocomplete" [displayWith]="displayWith.bind(this)">
+  <mat-option *ngFor="let token of tokens$ | async" [value]="token">
+    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+      <img [src]="token.img">
+      <span>{{ token.symbol }}</span>
+    </div>
+  </mat-option>
+</mat-autocomplete>

@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
-import { Web3Service } from '../../services/web3.service';
-
+import { Web3Service } from 'src/app/services/web3.service';
 @Component({
   selector: 'app-connect-button',
   templateUrl: 'connect-button.component.html',
@@ -8,7 +7,7 @@ import { Web3Service } from '../../services/web3.service';
 })
 export class ConnectButtonComponent {
 
-  public isConnected = this.web3Service.isConnected;
+  isConnected = this.web3Service.isConnected;
 
   constructor(private web3Service: Web3Service) { }
 

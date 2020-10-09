@@ -12,14 +12,14 @@ export class DBService {
     const col = this.firestore.collection('publicKeys').get().toPromise();
     const documents = await col;
     const allKeys = documents.docs.map(doc => doc.data()?.key);
-    return allKeys.includes(key)
+    return allKeys.includes(key);
   }
 
   async addKey(key: string): Promise<void> {
-    this.firestore.collection('publicKeys').add({ key });
+    this.firestore.collection('publicKeys').add({ key, payed: false });
   }
 
   logError(error: Error): void {
-    this.firestore.collection('errors').add({ message: error.message })
+    this.firestore.collection('errors').add({ message: error.message });
   }
 }

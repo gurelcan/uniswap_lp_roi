@@ -1,0 +1,25 @@
+:host {
+  display: block;
+  width: 90%;
+}
+
+h3 {
+  text-align: center;
+}
+
+table {
+  width: 100%;
+  height: 100%;
+  td,
+  th {
+    text-align: end;
+  }
+
+  tr:nth-child(even) {
+    background: #eee;
+  }
+}
+
+#cdk-describedby-message-container {
+  color: black;
+}
