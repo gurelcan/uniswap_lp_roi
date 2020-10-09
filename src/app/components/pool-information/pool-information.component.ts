@@ -4,6 +4,7 @@ import { MatAccordion } from '@angular/material/expansion';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { PoolQuery } from 'src/app/services/state/pool.query';
 import { PoolStore } from 'src/app/services/state/pool.store';
+import { Web3Service } from 'src/app/services/web3.service';
 
 @Component({
   selector: 'app-pool-information',
@@ -12,6 +13,8 @@ import { PoolStore } from 'src/app/services/state/pool.store';
 })
 export class PoolInformationComponent {
   @ViewChild(MatAccordion) accordion: MatAccordion;
+
+  showPoolInfo = this.query.select('address');
 
   form = new FormGroup({
     tokenOne: new FormControl(),
@@ -32,7 +35,7 @@ export class PoolInformationComponent {
 
   liquidityUSD = this.query.select('liquidityUSD');
 
-  isConnected$ = this.query.select('isConnected');
+  isConnected = this.web3.isConnected;
 
   inputRange = {
     tokenOne: { min: 0, max: 99999999 }, tokenTwo: { min: 0, max: 99999999 },
@@ -41,19 +44,27 @@ export class PoolInformationComponent {
 
   roi = this.query.select('roi');
 
-  @Input() set shouldOpen(value: boolean) {
-    value ? setTimeout(() => this.accordion.openAll(), 100) : null;
-  }
-
-  constructor(private query: PoolQuery, private poolStore: PoolStore, private cdr: ChangeDetectorRef) {
-    this.form.get('tokenOne').setValue(Math.round(this.query.getValue().token0.priceUSD));
-    this.form.get('tokenTwo').setValue(Math.round(this.query.getValue().token1.priceUSD));
-    this.form.get('volume').setValue(Math.round(this.query.getValue().volumeUSD));
-    this.form.get('liquidity').setValue(Math.round(this.query.getValue().liquidityUSD));
-    this.form.valueChanges.pipe(distinctUntilChanged(), debounceTime(500)).subscribe(() => {
-      this.calculateROI();
+  constructor(
+    private query: PoolQuery,
+    private poolStore: PoolStore,
+    private cdr: ChangeDetectorRef,
+    private web3: Web3Service) {
+    this.showPoolInfo.subscribe(value => {
+      if (value.length) {
+        this.form.get('tokenOne').setValue(Math.round(this.query.getValue().token0.priceUSD));
+        this.form.get('tokenTwo').setValue(Math.round(this.query.getValue().token1.priceUSD));
+        this.form.get('volume').setValue(Math.round(this.query.getValue().volumeUSD));
+        this.form.get('liquidity').setValue(Math.round(this.query.getValue().liquidityUSD));
+        this.form.valueChanges.pipe(distinctUntilChanged(), debounceTime(500)).subscribe(() => {
+          this.calculateROI();
+        });
+      }
     });
-    this.calculateROI();
+    this.showPoolInfo.subscribe(value => {
+      if (value.length) {
+        this.accordion.openAll();
+      }
+    });
   }
 
   formatLabel(value: number): string | number {
@@ -93,7 +104,7 @@ export class PoolInformationComponent {
       const volumePriceAppreciation = ((tokenOne / poolTokenOne) + (tokenTwo / poolTokenTwo)) / 2;
       const volumeAfterAppreciation = volumeUSD * volumePriceAppreciation;
       const liquidityAfterAppreciation = tokenOneLPAtExit * tokenOne + tokenTwoLPAtExit * tokenTwo;
-      
+
       console.log(liquidityAfterAppreciation)
       /* Range calculations */
       const liquidtyPriceAppreciation = liquidityAfterAppreciation / (investment + liquidityUSD);

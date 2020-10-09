@@ -1,14 +1,12 @@
-<mat-toolbar color="primary" class="mat-elevation-z2">
+<header fxLayout fxLayoutAlign="center baseline" fxLayoutGap="20px">
   <h1>Uniswap ROI Calculator</h1>
   <mat-icon>calculate</mat-icon>
-</mat-toolbar>
+</header>
 <main>
   <app-connect-button></app-connect-button>
 
   <app-search-bar></app-search-bar>
 
-  <ng-container *ngIf="!!(showInputs$ | async)">
-    <app-pool-information [shouldOpen]="true"></app-pool-information>
-  </ng-container>
+  <app-pool-information></app-pool-information>
 
 </main>

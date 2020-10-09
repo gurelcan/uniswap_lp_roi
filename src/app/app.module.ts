@@ -27,7 +27,6 @@ import { MyErrorHandler } from './services/error.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSliderModule } from '@angular/material/slider';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
@@ -36,6 +35,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -58,7 +58,6 @@ import { MatExpansionModule } from '@angular/material/expansion';
     MatFormFieldModule,
     MatInputModule,
     MatSliderModule,
-    MatToolbarModule,
     MatButtonModule,
     MatProgressSpinnerModule,
     MatIconModule,
@@ -66,7 +65,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
     MatDividerModule,
     MatSlideToggleModule,
     MatAutocompleteModule,
-    MatExpansionModule
+    MatExpansionModule,
+    MatTooltipModule
   ],
   bootstrap: [AppComponent],
   providers: [

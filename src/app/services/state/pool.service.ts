@@ -83,7 +83,6 @@ export class PoolService {
         console.error(error);
         this.poolStore.setLoading(false);
       }).then(value => {
-        console.log(value)
         const volume = value.data?.pairDayDatas[0].dailyVolumeUSD;
         value = value.data.pairs[0];
         this.poolStore.update({
@@ -138,7 +137,6 @@ export class PoolService {
         }`;
           const fetchedData = await this.fetchPairData(dailyQuery);
           const parsedPoolData = await fetchedData.json();
-          console.log(parsedPoolData.data.pairDayDatas[0].dailyVolumeUSD);
           volume = parsedPoolData.data.pairDayDatas[0].dailyVolumeUSD;
         }
         this.poolStore.update({

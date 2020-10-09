@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { PoolQuery } from 'src/app/services/state/pool.query';
 import { Web3Service } from 'src/app/services/web3.service';
 @Component({
   selector: 'app-connect-button',
@@ -8,9 +7,9 @@ import { Web3Service } from 'src/app/services/web3.service';
 })
 export class ConnectButtonComponent {
 
-  public isConnected = this.query.select('isConnected');
+  isConnected = this.web3Service.isConnected;
 
-  constructor(private query: PoolQuery, private web3Service: Web3Service) { }
+  constructor(private web3Service: Web3Service) { }
 
   public connect() {
     this.web3Service.init();

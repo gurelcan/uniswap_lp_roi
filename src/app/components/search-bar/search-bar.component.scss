@@ -17,9 +17,15 @@ section {
 
   button {
     margin: 25px;
+    transition: transform;
+    transition-duration: 200ms;
   }
 
   .pool-address {
     min-width: 350px;
   }
+}
+
+button:hover {
+  transform: scale(1.1);
 }

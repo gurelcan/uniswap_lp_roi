@@ -18,7 +18,6 @@ export interface PoolState {
   roi: Record<string, number>;
   liquidityUSD: number;
   volumeUSD: number;
-  isConnected: boolean;
   reserveTokenOne: number;
   reserveTokenTwo: number;
 }
@@ -40,7 +39,6 @@ const initPoolState: PoolState = {
   roi: {},
   liquidityUSD: 0,
   volumeUSD: 0,
-  isConnected: false,
   reserveTokenOne: 0,
   reserveTokenTwo: 0
 };
