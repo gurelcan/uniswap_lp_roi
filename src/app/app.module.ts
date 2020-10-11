@@ -35,7 +35,6 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -65,8 +64,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatDividerModule,
     MatSlideToggleModule,
     MatAutocompleteModule,
-    MatExpansionModule,
-    MatTooltipModule
+    MatExpansionModule
   ],
   bootstrap: [AppComponent],
   providers: [

@@ -14,9 +14,23 @@ export class SearchBarComponent {
 
   searchForm = new FormGroup({
     searchBySymbols: new FormControl(false),
-    tokenOne: new FormControl(),
-    tokenTwo: new FormControl(),
-    poolAddress: new FormControl('0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852')
+    tokenOne: new FormControl({
+      "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "symbol": "WETH",
+      "decimal": 18,
+      "chainId": 1,
+      "type": "default",
+      "img": `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png`
+    }),
+    tokenTwo: new FormControl({
+      "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+      "symbol": "WBTC",
+      "decimal": 18,
+      "chainId": 1,
+      "type": "default",
+      "img": `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599/logo.png`
+    }),
+    poolAddress: new FormControl('0xbb2b8038a1640196fbe3e38816f3e67cba72d940')
   });
 
   constructor(private poolService: PoolService, private query: PoolQuery) { }

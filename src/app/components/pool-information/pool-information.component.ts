@@ -1,11 +1,11 @@
 import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatAccordion } from '@angular/material/expansion';
-import { distinctUntilChanged } from 'rxjs/operators';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 import { PoolQuery } from 'src/app/services/state/pool.query';
 import { PoolStore } from 'src/app/services/state/pool.store';
 import { Web3Service } from 'src/app/services/web3.service';
-
 
 // Lodash
 import { isEqual } from 'lodash';
@@ -35,9 +35,9 @@ export class PoolInformationComponent {
 
   poolAddress = this.query.select('address');
 
-  volume = this.query.select('volumeUSD');
+  volume = this.query.select('volumeUSD').pipe(map(volume => volume.toFixed()));
 
-  liquidityUSD = this.query.select('liquidityUSD');
+  liquidityUSD = this.query.select('liquidityUSD').pipe(map(liquidity => liquidity.toFixed()));
 
   isConnected = this.web3.isConnected;
 
@@ -54,36 +54,28 @@ export class PoolInformationComponent {
     private query: PoolQuery,
     private poolStore: PoolStore,
     private cdr: ChangeDetectorRef,
-    private web3: Web3Service) {
+    private web3: Web3Service,
+    private snackbar: MatSnackBar) {
     this.showPoolInfo.subscribe(value => {
       if (value.length) {
-        this.form.get('tokenOne').setValue(Math.round(this.query.getValue().token0.priceUSD));
-        this.form.get('tokenTwo').setValue(Math.round(this.query.getValue().token1.priceUSD));
+        this.form.get('tokenOne').setValue(this.query.getValue().token0.priceUSD);
+        this.form.get('tokenTwo').setValue(this.query.getValue().token1.priceUSD);
         this.form.get('volume').setValue(Math.round(this.query.getValue().volumeUSD));
         this.form.get('liquidity').setValue(Math.round(this.query.getValue().liquidityUSD));
         this.accordion.openAll();
         this.form.valueChanges.pipe(distinctUntilChanged((prev, cur) => {
           this.shouldUpdateSliders = prev.liquidity === cur.liquidity && prev.volume === cur.volume;
           return isEqual(prev, cur);
-        })).subscribe(_ => this.calculateROI(this.shouldUpdateSliders));
+        })).subscribe(_ => {
+          console.log(this.isInRange());
+          if (this.isInRange()) {
+            this.calculateROI(this.shouldUpdateSliders);
+          } else {
+            this.snackbar.open('Something is not in range', 'close', { duration: 3000 });
+          }
+        });
       }
     });
-  }
-
-  formatLabel(value: number): string | number {
-    if (value >= 1000000000) {
-      return Math.round(value / 1000) + 'B';
-    }
-
-    if (value >= 1000000) {
-      return Math.round(value / 1000000) + 'M';
-    }
-
-    if (value >= 1000) {
-      return Math.round(value / 1000) + 'K';
-    }
-
-    return value;
   }
 
   calculateROI(updateSliders: boolean) {
@@ -172,5 +164,18 @@ export class PoolInformationComponent {
   }
   private findMaxValue(one: number, two: number): number {
     return one >= two ? one : two;
+  }
+
+  private isInRange() {
+    return (
+      this.form.get('tokenTwo').value > this.inputRange.tokenTwo.min &&
+      this.form.get('tokenTwo').value < this.inputRange.tokenTwo.max &&
+      this.form.get('tokenOne').value > this.inputRange.tokenOne.min &&
+      this.form.get('tokenOne').value < this.inputRange.tokenOne.max &&
+      this.form.get('days').value > 1 &&
+      this.form.get('days').value <= 365 &&
+      this.form.get('investment').value > 100 &&
+      this.form.get('investment').value < this.query.getValue().liquidityUSD
+    );
   }
 }
