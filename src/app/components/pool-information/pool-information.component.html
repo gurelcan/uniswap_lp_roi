@@ -21,22 +21,22 @@
         <div fxLayout="column" fxLayoutAlign="center center">
           <ng-container *ngIf="tokenOne$ | async as token">
             <strong>{{ token.symbol || 'No symbol provided' }}</strong>
-            <span>{{ token.priceUSD | number }}$</span>
+            <span>{{ token.priceUSD | number }} <span class="pink">$</span></span>
           </ng-container>
         </div>
         <div fxLayout="column" fxLayoutAlign="center center">
           <ng-container *ngIf="tokenTwo$ | async as token">
             <strong>{{ token.symbol || 'No symbol provided' }}</strong>
-            <span>{{ token.priceUSD | number }}$</span>
+            <span>{{ token.priceUSD | number }} <span class="pink">$</span></span>
           </ng-container>
         </div>
         <div fxLayout="column" fxLayoutAlign="center center">
           <strong>Volume</strong>
-          <span>{{ volume | async | number }}$</span>
+          <span>{{ volume | async | number }} <span class="pink">$</span></span>
         </div>
         <div fxLayout="column" fxLayoutAlign="center center">
           <strong>Liquidity</strong>
-          <span>{{ liquidityUSD | async | number }}$</span>
+          <span>{{ liquidityUSD | async | number }} <span class="pink">$</span></span>
         </div>
       </div>
     </ng-container>
@@ -83,31 +83,40 @@
           </ng-container>
         </div>
 
-        <div fxLayout fxLayoutAlign="center center" fxLayoutGap="20px">
+        <div fxLayout fxLayoutAlign="space-between center" fxLayoutGap="20px" class="full-width">
 
-          <span [matTooltip]="'Volume: ' + form.get('volume').value">Volume: </span>
-          <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputRange.vol.min" [max]="inputRange.vol.max"
-            color="primary" [formControl]="form.get('volume')" [matTooltip]="'Volume: ' + form.get('volume').value">
+          <span>Volume: </span>
+          <span>{{form.get('volume').value | number }} $</span>
+          <mat-slider [min]="inputRange.vol.min" [max]="inputRange.vol.max" color="primary"
+            [formControl]="form.get('volume')">
           </mat-slider>
 
-          <span [matTooltip]="'Liquidity: ' + form.get('liquidity').value">Liquidity: </span>
-          <mat-slider thumbLabel [displayWith]="formatLabel" [min]="inputRange.liq.min" [max]="inputRange.liq.max"
-            color="primary" [formControl]="form.get('liquidity')"
-            [matTooltip]="'Liquidity: ' + form.get('liquidity').value">
+          <span>Liquidity: </span>
+          <span>{{form.get('liquidity').value | number }} $</span>
+          <mat-slider [min]="inputRange.liq.min" [max]="inputRange.liq.max" color="primary"
+            [formControl]="form.get('liquidity')">
           </mat-slider>
 
         </div>
 
-        <div fxLayout fxLayoutAlign="center start" fxLayoutGap="20px">
+        <div fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="20px">
           <mat-form-field appearance="outline">
             <mat-label>Investment in USD</mat-label>
             <input matInput type="number" [formControl]="form.get('investment')" autocomplete="off">
           </mat-form-field>
 
+          <mat-error *ngIf="form.get('investment').value < 100">Investment must be above 100$</mat-error>
+          <mat-error *ngIf="form.get('investment').value > (liquidityUSD | async)">Investment can't be above
+            {{ liquidityUSD | async | number }}$</mat-error>
+
           <mat-form-field appearance="outline">
             <mat-label>Days in pool</mat-label>
             <input matInput type="number" [formControl]="form.get('days')" autocomplete="off" min="1" max="365">
           </mat-form-field>
+
+          <mat-error *ngIf="form.get('days').value < 1">Days can't below 1</mat-error>
+          <mat-error *ngIf="form.get('days').value >= 365">Days can't above 365</mat-error>
+
         </div>
       </article>
     </ng-container>
@@ -122,9 +131,9 @@
 
     <ng-container *ngIf="isConnected.asObservable() | async; else connect">
 
-      <ng-container *ngIf="!!(showPoolInfo |async)">
+      <ng-container *ngIf="!!(showPoolInfo |async); else searchPool">
         <article *ngIf="(roi | async) as roi">
-          <table>
+          <table *ngIf="isInRange(); else error">
             <tr>
               <th></th>
               <th>Pool</th>
@@ -183,6 +192,12 @@
       <div fxLayout fxLayoutAlign="center start">
         <app-connect-button></app-connect-button>
       </div>
+    </ng-template>
+    <ng-template #error>
+      <h3>Found an error in the <span class="pink">calculations</span></h3>
+    </ng-template>
+    <ng-template #searchPool>
+        <h3>Search for a Pool to see your <span class="pink">results</span></h3>
     </ng-template>
   </mat-expansion-panel>
 </mat-accordion>

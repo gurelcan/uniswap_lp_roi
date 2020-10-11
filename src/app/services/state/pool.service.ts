@@ -91,13 +91,13 @@ export class PoolService {
             decimal: value.token0.decimals,
             address: value.token0.id,
             symbol: value.token0.symbol,
-            priceUSD: value.reserveUSD / 2 / value.reserve0
+            priceUSD: Math.round(value.reserveUSD / 2 / value.reserve0)
           },
           token1: {
             decimal: value.token1.decimals,
             address: value.token1.id,
             symbol: value.token1.symbol,
-            priceUSD: value.reserveUSD / 2 / value.reserve1
+            priceUSD: Math.round(value.reserveUSD / 2 / value.reserve1)
           },
           liquidityUSD: Math.round(value.reserveUSD),
           volumeUSD: Math.round(volume),
