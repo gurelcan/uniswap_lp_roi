@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatAccordion } from '@angular/material/expansion';
-import { distinctUntilChanged, map } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
 import { PoolQuery } from 'src/app/services/state/pool.query';
 import { PoolStore } from 'src/app/services/state/pool.store';
 import { Web3Service } from 'src/app/services/web3.service';
@@ -63,17 +63,18 @@ export class PoolInformationComponent {
         this.form.get('volume').setValue(Math.round(this.query.getValue().volumeUSD));
         this.form.get('liquidity').setValue(Math.round(this.query.getValue().liquidityUSD));
         this.accordion.openAll();
-        this.form.valueChanges.pipe(distinctUntilChanged((prev, cur) => {
-          this.shouldUpdateSliders = prev.liquidity === cur.liquidity && prev.volume === cur.volume;
-          return isEqual(prev, cur);
-        })).subscribe(_ => {
-          console.log(this.isInRange());
-          if (this.isInRange()) {
-            this.calculateROI(this.shouldUpdateSliders);
-          } else {
-            this.snackbar.open('Something is not in range', 'close', { duration: 3000 });
-          }
-        });
+        this.form.valueChanges.pipe(
+          debounceTime(500),
+          distinctUntilChanged((prev, cur) => {
+            this.shouldUpdateSliders = prev.liquidity === cur.liquidity && prev.volume === cur.volume;
+            return isEqual(prev, cur);
+          })).subscribe(_ => {
+            if (this.isInRange()) {
+              this.calculateROI(this.shouldUpdateSliders);
+            } else {
+              this.snackbar.open('Something is not in range', 'close', { duration: 3000 });
+            }
+          });
       }
     });
   }
@@ -166,7 +167,7 @@ export class PoolInformationComponent {
     return one >= two ? one : two;
   }
 
-  private isInRange() {
+  public isInRange() {
     return (
       this.form.get('tokenTwo').value > this.inputRange.tokenTwo.min &&
       this.form.get('tokenTwo').value < this.inputRange.tokenTwo.max &&

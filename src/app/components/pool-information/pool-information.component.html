@@ -21,22 +21,22 @@
         <div fxLayout="column" fxLayoutAlign="center center">
           <ng-container *ngIf="tokenOne$ | async as token">
             <strong>{{ token.symbol || 'No symbol provided' }}</strong>
-            <span>{{ token.priceUSD | number }}$</span>
+            <span>{{ token.priceUSD | number }} <span class="pink">$</span></span>
           </ng-container>
         </div>
         <div fxLayout="column" fxLayoutAlign="center center">
           <ng-container *ngIf="tokenTwo$ | async as token">
             <strong>{{ token.symbol || 'No symbol provided' }}</strong>
-            <span>{{ token.priceUSD | number }}$</span>
+            <span>{{ token.priceUSD | number }} <span class="pink">$</span></span>
           </ng-container>
         </div>
         <div fxLayout="column" fxLayoutAlign="center center">
           <strong>Volume</strong>
-          <span>{{ volume | async | number }}$</span>
+          <span>{{ volume | async | number }} <span class="pink">$</span></span>
         </div>
         <div fxLayout="column" fxLayoutAlign="center center">
           <strong>Liquidity</strong>
-          <span>{{ liquidityUSD | async | number }}$</span>
+          <span>{{ liquidityUSD | async | number }} <span class="pink">$</span></span>
         </div>
       </div>
     </ng-container>
@@ -131,9 +131,9 @@
 
     <ng-container *ngIf="isConnected.asObservable() | async; else connect">
 
-      <ng-container *ngIf="!!(showPoolInfo |async)">
+      <ng-container *ngIf="!!(showPoolInfo |async); else searchPool">
         <article *ngIf="(roi | async) as roi">
-          <table>
+          <table *ngIf="isInRange(); else error">
             <tr>
               <th></th>
               <th>Pool</th>
@@ -192,6 +192,12 @@
       <div fxLayout fxLayoutAlign="center start">
         <app-connect-button></app-connect-button>
       </div>
+    </ng-template>
+    <ng-template #error>
+      <h3>Found an error in the <span class="pink">calculations</span></h3>
+    </ng-template>
+    <ng-template #searchPool>
+        <h3>Search for a Pool to see your <span class="pink">results</span></h3>
     </ng-template>
   </mat-expansion-panel>
 </mat-accordion>
