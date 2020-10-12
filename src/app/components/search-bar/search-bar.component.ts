@@ -13,7 +13,7 @@ export class SearchBarComponent {
   public loading = this.query.selectLoading();
 
   searchForm = new FormGroup({
-    searchBySymbols: new FormControl(false),
+    searchBySymbols: new FormControl(true),
     tokenOne: new FormControl({
       "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
       "symbol": "WETH",

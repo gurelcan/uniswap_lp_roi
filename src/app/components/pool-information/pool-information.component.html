@@ -83,19 +83,23 @@
           </ng-container>
         </div>
 
-        <div fxLayout fxLayoutAlign="space-between center" fxLayoutGap="20px" class="full-width">
+        <div fxLayout="column" fxLayoutAlign="space-between center" fxLayoutGap="20px" class="full-width">
 
-          <span>Volume: </span>
-          <span>{{form.get('volume').value | number }} $</span>
-          <mat-slider [min]="inputRange.vol.min" [max]="inputRange.vol.max" color="primary"
-            [formControl]="form.get('volume')">
-          </mat-slider>
+          <div fxLayout fxLayoutAlign="center start" fxLayoutGap="10px">
+            <span>Volume: </span>
+            <span>{{form.get('volume').value | number }} $</span>
+            <mat-slider [min]="inputRange.vol.min" [max]="inputRange.vol.max" color="primary"
+              [formControl]="form.get('volume')">
+            </mat-slider>
+          </div>
 
-          <span>Liquidity: </span>
-          <span>{{form.get('liquidity').value | number }} $</span>
-          <mat-slider [min]="inputRange.liq.min" [max]="inputRange.liq.max" color="primary"
-            [formControl]="form.get('liquidity')">
-          </mat-slider>
+          <div fxLayout fxLayoutAlign="center start" fxLayoutGap="10px">
+            <span>Liquidity: </span>
+            <span>{{form.get('liquidity').value | number }} $</span>
+            <mat-slider [min]="inputRange.liq.min" [max]="inputRange.liq.max" color="primary"
+              [formControl]="form.get('liquidity')">
+            </mat-slider>
+          </div>
 
         </div>
 
@@ -133,7 +137,7 @@
 
       <ng-container *ngIf="!!(showPoolInfo |async); else searchPool">
         <article *ngIf="(roi | async) as roi">
-          <table *ngIf="isInRange(); else error">
+          <table>
             <tr>
               <th></th>
               <th>Pool</th>
@@ -193,11 +197,8 @@
         <app-connect-button></app-connect-button>
       </div>
     </ng-template>
-    <ng-template #error>
-      <h3>Found an error in the <span class="pink">calculations</span></h3>
-    </ng-template>
     <ng-template #searchPool>
-        <h3>Search for a Pool to see your <span class="pink">results</span></h3>
+      <h3>Search for a Pool to see your <span class="pink">results</span></h3>
     </ng-template>
   </mat-expansion-panel>
 </mat-accordion>
