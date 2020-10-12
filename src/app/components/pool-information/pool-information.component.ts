@@ -1,6 +1,5 @@
 import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatAccordion } from '@angular/material/expansion';
 import { debounceTime, distinctUntilChanged, map, tap } from 'rxjs/operators';
 import { PoolQuery } from 'src/app/services/state/pool.query';
@@ -54,8 +53,7 @@ export class PoolInformationComponent {
     private query: PoolQuery,
     private poolStore: PoolStore,
     private cdr: ChangeDetectorRef,
-    private web3: Web3Service,
-    private snackbar: MatSnackBar) {
+    private web3: Web3Service) {
     this.showPoolInfo.subscribe(value => {
       if (value.length) {
         this.form.get('tokenOne').setValue(this.query.getValue().token0.priceUSD);
@@ -73,8 +71,6 @@ export class PoolInformationComponent {
       })).subscribe(_ => {
         if (this.isInRange()) {
           this.calculateROI(this.shouldUpdateSliders);
-        } else {
-          this.snackbar.open('Something is not in range', 'close', { duration: 3000 });
         }
       });
   }
